@@ -1,0 +1,5 @@
+app_name: psc-statement-delta-consumer
+group: api
+weight: 991
+routes:
+   1: ^/psc-statement-delta-consumer/healthcheck
