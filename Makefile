@@ -10,7 +10,7 @@ clean:
 	rm -f ./$(artifact_name).jar
 	rm -f ./$(artifact_name)-*.zip
 	rm -rf ./build-*
-  rm -f ./build.log
+	rm -f ./build.log
 
 .PHONY: build
 build:
