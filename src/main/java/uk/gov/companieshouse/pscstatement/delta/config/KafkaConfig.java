@@ -16,7 +16,8 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import uk.gov.companieshouse.api.delta.PscStatementDelta;
-import uk.gov.companieshouse.pscstatement.delta.serialization.PscStatementDeltaDeserializer;
+import uk.gov.companieshouse.delta.ChsDelta;
+import uk.gov.companieshouse.pscstatement.delta.serialization.ChsDeltaDeserializer;
 
 @Configuration
 @EnableKafka
@@ -25,35 +26,35 @@ public class KafkaConfig {
 
     private final String bootstrapServers;
     private final Integer listenerConcurrency;
-    private  final PscStatementDeltaDeserializer pscStatementDeltaDeserializer;
+    private  final ChsDeltaDeserializer chsDeltaDeserializer;
 
     /**
      * Constructor.
      */
-    public KafkaConfig(PscStatementDeltaDeserializer pscStatementDeltaDeserializer,
+    public KafkaConfig(ChsDeltaDeserializer chsDeltaDeserializer,
                        @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers,
                        @Value("${spring.kafka.listener.concurrency}") Integer listenerConcurrency) {
         this.bootstrapServers = bootstrapServers;
         this.listenerConcurrency = listenerConcurrency;
-        this.pscStatementDeltaDeserializer = pscStatementDeltaDeserializer;
+        this.chsDeltaDeserializer = chsDeltaDeserializer;
     }
 
     /**
      * Kafka Consumer Factory.
      */
     @Bean
-    public ConsumerFactory<String, PscStatementDelta> kafkaConsumerFactory() {
+    public ConsumerFactory<String, ChsDelta> kafkaConsumerFactory() {
         return new DefaultKafkaConsumerFactory<>(consumerConfigs(), new StringDeserializer(),
-                new ErrorHandlingDeserializer<>(pscStatementDeltaDeserializer));
+                new ErrorHandlingDeserializer<>(chsDeltaDeserializer));
     }
 
     /**
      * Kafka Listener Container Factory.
      */
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, PscStatementDelta>
+    public ConcurrentKafkaListenerContainerFactory<String, ChsDelta>
             listenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, PscStatementDelta> factory
+        ConcurrentKafkaListenerContainerFactory<String, ChsDelta> factory
                 = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(kafkaConsumerFactory());
         factory.setConcurrency(listenerConcurrency);
@@ -70,7 +71,7 @@ public class KafkaConfig {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class);
         props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS,
-                PscStatementDeltaDeserializer.class);
+                ChsDeltaDeserializer.class);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
         props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");

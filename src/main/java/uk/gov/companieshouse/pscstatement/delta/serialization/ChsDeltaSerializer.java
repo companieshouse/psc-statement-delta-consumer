@@ -8,17 +8,18 @@ import org.apache.avro.specific.SpecificDatumWriter;
 import org.apache.kafka.common.serialization.Serializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.companieshouse.api.delta.PscStatementDelta;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.kafka.serialization.AvroSerializer;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.pscstatement.delta.exception.NonRetryableErrorException;
 
-public class PscStatementSerializer {
+@Component
+public class ChsDeltaSerializer implements Serializer<Object> {
+
     private final Logger logger;
 
     @Autowired
-    public PscStatementSerializer(Logger logger) {
+    public ChsDeltaSerializer(Logger logger) {
         this.logger = logger;
     }
 

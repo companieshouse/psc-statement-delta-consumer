@@ -15,6 +15,7 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.api.delta.PscStatementDelta;
+import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.pscstatement.delta.exception.NonRetryableErrorException;
 import uk.gov.companieshouse.pscstatement.delta.processor.PscStatementDeltaProcessor;
@@ -46,12 +47,12 @@ public class PscStatementDeltaConsumer {
     @KafkaListener(topics = "${psc-statement.delta.topic}",
             groupId = "${psc-statement.delta.group-id}",
             containerFactory = "listenerContainerFactory")
-    public void receiveMainMessages(Message<PscStatementDelta> message,
+    public void receiveMainMessages(Message<ChsDelta> message,
                                     @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) String partition,
                                     @Header(KafkaHeaders.OFFSET) String offset) {
         Instant startTime = Instant.now();
-        PscStatementDelta pscStatementDelta = message.getPayload();
+        ChsDelta chsDelta = message.getPayload();
         try {
             deltaProcessor.processDelta(message);
         } catch (Exception exception) {
