@@ -14,7 +14,7 @@ import uk.gov.companieshouse.logging.Logger;
 
 @Component
 public class ChsDeltaDeserializer implements Deserializer<ChsDelta> {
-    private final Logger logger;
+    Logger logger;
 
     @Autowired
     public ChsDeltaDeserializer(Logger logger) {
@@ -31,7 +31,7 @@ public class ChsDeltaDeserializer implements Deserializer<ChsDelta> {
                     new ReflectDatumReader<>(ChsDelta.class);
             ChsDelta chsDelta = reader.read(null, decoder);
             logger.info(String.format("Message successfully de-serialised into "
-                    + "Avro pscStatementDelta object: %s", chsDelta));
+                    + "chsDelta object: %s", chsDelta));
             return chsDelta;
         } catch (Exception ex) {
             logger.error("De-Serialization exception while converting to Avro schema object", ex);
