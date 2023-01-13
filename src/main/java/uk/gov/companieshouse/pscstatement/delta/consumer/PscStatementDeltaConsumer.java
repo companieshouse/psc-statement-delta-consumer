@@ -61,6 +61,4 @@ public class PscStatementDeltaConsumer {
             throw exception;
         }
     }
-
-
 }

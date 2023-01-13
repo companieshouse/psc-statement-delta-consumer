@@ -1,5 +1,7 @@
 package uk.gov.companieshouse.pscstatement.delta.serialization;
 
+import java.util.Arrays;
+
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
@@ -9,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.logging.Logger;
-
+import uk.gov.companieshouse.pscstatement.delta.exception.NonRetryableErrorException;
 
 
 @Component
@@ -23,8 +25,6 @@ public class ChsDeltaDeserializer implements Deserializer<ChsDelta> {
 
     @Override
     public ChsDelta deserialize(String topic, byte[] data) {
-        logger.info(String.format("Message picked up from topic with data: %s",
-                new String(data)));
         try {
             Decoder decoder = DecoderFactory.get().binaryDecoder(data, null);
             DatumReader<ChsDelta> reader =
@@ -35,7 +35,7 @@ public class ChsDeltaDeserializer implements Deserializer<ChsDelta> {
             return chsDelta;
         } catch (Exception ex) {
             logger.error("De-Serialization exception while converting to Avro schema object", ex);
-            throw new RuntimeException(ex);
+            throw new NonRetryableErrorException(ex);
         }
     }
 }
