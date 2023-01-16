@@ -25,6 +25,7 @@
         <structured-logging.version>1.9.12</structured-logging.version>
         <kafka-models.version>1.0.27</kafka-models.version>
         <api-sdk-manager-java-library.version>1.0.4</api-sdk-manager-java-library.version>
+        <private-api-sdk-java.version>2.0.174</private-api-sdk-java.version>
         <jib-maven-plugin.version>3.1.1</jib-maven-plugin.version>
         <io-cucumber.version>7.2.3</io-cucumber.version>
         <springfox-boot-starter.version>3.0.0</springfox-boot-starter.version>
@@ -218,11 +219,6 @@
                     <artifactId>handlebars-helpers</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>uk.gov.companieshouse</groupId>
-            <artifactId>private-api-sdk-java</artifactId>
-            <version>2.0.199</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
