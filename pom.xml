@@ -15,7 +15,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>11</java.version>
-        <main.class>uk.gov.companieshouse.pscstatement.delta.PSCStatementDeltaConsumerApplication</main.class>
+        <main.class>uk.gov.companieshouse.pscstatement.delta.PscStatementDeltaConsumerApplication</main.class>
         <map-struct.version>1.4.2.Final</map-struct.version>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <maven-build-helper-plugin.version>3.2.0</maven-build-helper-plugin.version>
