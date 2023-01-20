@@ -30,7 +30,8 @@ public class PscStatementDeltaProcessor {
     public void processDelta(Message<ChsDelta> chsDelta) {
         final MessageHeaders headers = chsDelta.getHeaders();
         final ChsDelta payload = chsDelta.getPayload();
-        logger.info(format("Successfully extracted Chs Delta of %s", payload));
+        logger.info(format("Successfully extracted Chs Delta with context_id %s",
+                payload.getContextId()));
         ObjectMapper mapper = new ObjectMapper();
         PscStatementDelta pscStatementDelta;
         try {
