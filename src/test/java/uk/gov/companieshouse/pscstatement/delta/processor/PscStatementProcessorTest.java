@@ -15,7 +15,8 @@ import uk.gov.companieshouse.pscstatement.delta.utils.TestHelper;
 
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThrows;
+
 
 @ExtendWith(MockitoExtension.class)
 public class PscStatementProcessorTest {
