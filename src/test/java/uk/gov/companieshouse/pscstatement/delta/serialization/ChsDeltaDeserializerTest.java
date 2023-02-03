@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.pscstatement.delta.exception.NonRetryableErrorException;
-import uk.gov.companieshouse.pscstatement.delta.serialization.ChsDeltaDeserializer;
 import uk.gov.companieshouse.pscstatement.delta.utils.TestHelper;
 
 import java.io.IOException;

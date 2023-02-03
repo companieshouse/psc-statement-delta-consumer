@@ -1,7 +1,5 @@
 package uk.gov.companieshouse.pscstatement.delta.serialization;
 
-import java.util.Arrays;
-
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
