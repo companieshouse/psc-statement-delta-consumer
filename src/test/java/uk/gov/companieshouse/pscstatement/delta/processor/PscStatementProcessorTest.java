@@ -11,6 +11,7 @@ import org.springframework.messaging.Message;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.pscstatement.delta.exception.NonRetryableErrorException;
+import uk.gov.companieshouse.pscstatement.delta.service.ApiClientService;
 import uk.gov.companieshouse.pscstatement.delta.utils.TestHelper;
 
 import java.io.IOException;
@@ -26,9 +27,12 @@ public class PscStatementProcessorTest {
     @Mock
     private Logger logger;
 
+    @Mock
+    private ApiClientService apiClientService;
+
     @BeforeEach
     void setUp() {
-        deltaProcessor = new PscStatementDeltaProcessor(logger);
+        deltaProcessor = new PscStatementDeltaProcessor(logger, apiClientService);
     }
 
     @Test
@@ -40,8 +44,21 @@ public class PscStatementProcessorTest {
     @Test
     @DisplayName("Confirms the Processor does not throw when a valid ChsDelta is given")
     void When_ValidChsDeltaMessage_Expect_ProcessorDoesNotThrow() throws IOException {
-        Message<ChsDelta> mockChsDeltaMessage = testHelper.createChsDeltaMessage();
+        Message<ChsDelta> mockChsDeltaMessage = testHelper.createChsDeltaMessage(false);
         Assertions.assertDoesNotThrow(() -> deltaProcessor.processDelta(mockChsDeltaMessage));
+    }
+
+    @Test
+    void When_InvalidChsDeleteDeltaMessage_Expect_NonRetryableError() {
+        Message<ChsDelta> mockChsDeltaMessage = testHelper.createInvalidChsDeltaMessage();
+        assertThrows(NonRetryableErrorException.class, ()->deltaProcessor.processDeleteDelta(mockChsDeltaMessage));
+    }
+
+    @Test
+    @DisplayName("Confirms the Processor does not throw when a valid delete ChsDelta is given")
+    void When_ValidChsDeleteDeltaMessage_Expect_ProcessorDoesNotThrow() throws IOException {
+        Message<ChsDelta> mockChsDeltaMessage = testHelper.createChsDeltaMessage(true);
+        Assertions.assertDoesNotThrow(() -> deltaProcessor.processDeleteDelta(mockChsDeltaMessage));
     }
 
 }
