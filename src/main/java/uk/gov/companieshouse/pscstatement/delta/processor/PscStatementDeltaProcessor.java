@@ -43,7 +43,7 @@ public class PscStatementDeltaProcessor {
         try {
             pscStatementDelta = mapper.readValue(payload.getData(),
                     PscStatementDelta.class);
-            logger.info(format("Successfully extracted psc-statement delta of %s",
+            logger.trace(format("Successfully extracted psc-statement delta of %s",
                     pscStatementDelta.toString()));
             List<PscStatement> statements = pscStatementDelta.getPscStatements();
             for (PscStatement pscStatement : statements) {

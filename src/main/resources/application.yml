@@ -21,6 +21,9 @@ psc-statement:
     retry-attempts: ${PSC_STATEMENT_DELTA_ATTEMPTS:4}
     backoff-delay: ${PSC_STATEMENT_DELTA_BACKOFF_DELAY:100}
 
+encoding:
+  salt: ${PSC_STATEMENT_SALT}
+
 management:
   endpoints:
     enabled-by-default: false
