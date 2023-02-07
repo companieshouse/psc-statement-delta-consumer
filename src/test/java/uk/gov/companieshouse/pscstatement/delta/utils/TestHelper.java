@@ -30,6 +30,17 @@ public class TestHelper {
         return buildMessage("This is some invalid data");
     }
 
+    public byte[] createByteArray() throws IOException {
+        InputStreamReader exampleArray = new InputStreamReader(
+                ClassLoader.getSystemClassLoader().getResourceAsStream("serialized-bytes-array.txt"));
+        String[] byteString = FileCopyUtils.copyToString(exampleArray).split(",");
+        byte[] bytes = new byte[byteString.length];
+        for(int i = 0 ; i < bytes.length ; ++i) {
+            bytes[i] = Byte.parseByte(byteString[i]);
+        }
+        return bytes;
+    }
+
     private ChsDelta buildDelta(String data) {
         return ChsDelta.newBuilder()
                 .setData(data)
