@@ -15,7 +15,6 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
-import uk.gov.companieshouse.api.delta.PscStatementDelta;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.pscstatement.delta.serialization.ChsDeltaDeserializer;
 

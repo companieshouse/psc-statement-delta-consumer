@@ -25,5 +25,8 @@ hs_err_pid*
 #ignore target file
 target/
 
+#ide ignore
+.vscode/
+
 .idea
 *.iml
