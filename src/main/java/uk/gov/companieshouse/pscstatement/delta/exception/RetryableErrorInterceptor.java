@@ -9,17 +9,24 @@ import org.apache.kafka.clients.producer.ProducerInterceptor;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.header.Header;
-import uk.gov.companieshouse.pscstatement.delta.config.LoggingConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import uk.gov.companieshouse.logging.Logger;
 
 public class RetryableErrorInterceptor implements ProducerInterceptor<String, Object> {
+    private Logger logger;
+
+    @Autowired
+    public RetryableErrorInterceptor(Logger logger) {
+        this.logger = logger;
+    }
+
     @Override
     public ProducerRecord<String, Object> onSend(ProducerRecord<String, Object> record) {
         String nextTopic = record.topic().contains("-error") ? getNextErrorTopic(record)
                 : record.topic();
-        if (LoggingConfig.getLogger() != null) {
-            LoggingConfig.getLogger().info(format("Moving record into new topic: %s with value: %s",
-                    nextTopic, record.value()));
-        }
+        logger.info(format("Moving record into new topic: %s with value: %s",
+                nextTopic, record.value()));
+
         if (nextTopic.contains("-invalid")) {
             return new ProducerRecord<>(nextTopic, record.key(), record.value());
         }

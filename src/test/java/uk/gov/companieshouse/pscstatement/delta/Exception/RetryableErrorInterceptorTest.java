@@ -4,7 +4,9 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.pscstatement.delta.exception.NonRetryableErrorException;
 import uk.gov.companieshouse.pscstatement.delta.exception.RetryableErrorException;
 import uk.gov.companieshouse.pscstatement.delta.exception.RetryableErrorInterceptor;
@@ -19,9 +21,12 @@ public class RetryableErrorInterceptorTest {
 
     private TestHelper testHelper;
 
+    @Mock
+    private Logger logger;
+
     @BeforeEach
     public void setUp() {
-        retryableErrorInterceptor = new RetryableErrorInterceptor();
+        retryableErrorInterceptor = new RetryableErrorInterceptor(logger);
         testHelper = new TestHelper();
     }
 

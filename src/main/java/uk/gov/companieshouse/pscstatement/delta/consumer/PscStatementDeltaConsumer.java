@@ -1,10 +1,6 @@
 package uk.gov.companieshouse.pscstatement.delta.consumer;
 
-import static java.lang.String.format;
-
-import java.io.IOException;
 import java.time.Instant;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
@@ -15,7 +11,6 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Component;
-import uk.gov.companieshouse.api.handler.exception.URIValidationException;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.pscstatement.delta.exception.NonRetryableErrorException;
@@ -51,20 +46,13 @@ public class PscStatementDeltaConsumer {
     public void receiveMainMessages(Message<ChsDelta> message,
                                     @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) String partition,
-                                    @Header(KafkaHeaders.OFFSET) String offset) throws IOException,
-            URIValidationException {
+                                    @Header(KafkaHeaders.OFFSET) String offset) {
         Instant startTime = Instant.now();
         ChsDelta chsDelta = message.getPayload();
-        try {
-            if (chsDelta.getIsDelete()) {
-                deltaProcessor.processDeleteDelta(message);
-            } else {
-                deltaProcessor.processDelta(message);
-            }
-        } catch (Exception exception) {
-            logger.error(format("Exception occurred while processing "
-                    + "message on the topic: %s", topic), exception, null);
-            throw exception;
+        if (chsDelta.getIsDelete()) {
+            deltaProcessor.processDeleteDelta(message);
+        } else {
+            deltaProcessor.processDelta(message);
         }
     }
 }

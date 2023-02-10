@@ -8,11 +8,9 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.FileCopyUtils;
 import uk.gov.companieshouse.delta.ChsDelta;
-import uk.gov.companieshouse.pscstatement.delta.exception.NonRetryableErrorException;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Optional;
 
 import static org.springframework.kafka.support.KafkaHeaders.EXCEPTION_CAUSE_FQCN;
 
