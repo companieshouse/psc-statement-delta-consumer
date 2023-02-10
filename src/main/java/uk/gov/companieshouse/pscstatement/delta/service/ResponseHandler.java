@@ -46,6 +46,10 @@ public class ResponseHandler {
             String msg = "Unsuccessful response received from psc-statements-data-api";
             logger.errorContext(context, msg, ex, logMap);
             throw new RetryableErrorException(ex);
+        } catch (Exception ex) {
+            String msg = "error response";
+            logger.errorContext(context, msg, ex, logMap);
+            throw new RetryableErrorException(ex);
         }
     }
 }

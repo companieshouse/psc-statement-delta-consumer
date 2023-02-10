@@ -3,30 +3,38 @@ package uk.gov.companieshouse.pscstatement.delta.processor;
 import static java.lang.String.format;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Component;
+import uk.gov.companieshouse.api.delta.PscStatement;
 import uk.gov.companieshouse.api.delta.PscStatementDeleteDelta;
 import uk.gov.companieshouse.api.delta.PscStatementDelta;
-import uk.gov.companieshouse.api.handler.exception.URIValidationException;
+import uk.gov.companieshouse.api.psc.CompanyPscStatement;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.pscstatement.delta.exception.NonRetryableErrorException;
 import uk.gov.companieshouse.pscstatement.delta.service.ApiClientService;
+import uk.gov.companieshouse.pscstatement.delta.transformer.PscStatementApiTransformer;
 
 @Component
 public class PscStatementDeltaProcessor {
 
+    private final PscStatementApiTransformer transformer;
     private final Logger logger;
 
     private ApiClientService apiClientService;
 
+    /**
+     * processor constructor.
+     */
     @Autowired
-    public PscStatementDeltaProcessor(Logger logger, ApiClientService apiClientService) {
+    public PscStatementDeltaProcessor(Logger logger, ApiClientService apiClientService,
+                                      PscStatementApiTransformer transformer) {
         this.logger = logger;
         this.apiClientService = apiClientService;
+        this.transformer = transformer;
     }
 
     /**
@@ -42,8 +50,15 @@ public class PscStatementDeltaProcessor {
         try {
             pscStatementDelta = mapper.readValue(payload.getData(),
                     PscStatementDelta.class);
-            logger.info(format("Successfully extracted psc-statement delta of %s",
+            logger.trace(format("Successfully extracted psc-statement delta of %s",
                     pscStatementDelta.toString()));
+            List<PscStatement> statements = pscStatementDelta.getPscStatements();
+            for (PscStatement pscStatement : statements) {
+                CompanyPscStatement companyPscStatement = transformer.transform(pscStatement);
+                companyPscStatement.setDeltaAt(pscStatementDelta.getDeltaAt());
+                logger.info(format("CompanyPscStatement: %s", companyPscStatement)); //remove
+
+            }
         } catch (Exception ex) {
             throw new NonRetryableErrorException(
                     "Error when extracting psc-statement delta", ex);
@@ -53,7 +68,7 @@ public class PscStatementDeltaProcessor {
     /**
      * Process PSC Statement delete Delta message.
      */
-    public void processDeleteDelta(Message<ChsDelta> chsDelta) throws IOException, URIValidationException {
+    public void processDeleteDelta(Message<ChsDelta> chsDelta) {
         final ChsDelta payload = chsDelta.getPayload();
         final String contextId = payload.getContextId();
         PscStatementDeleteDelta pscStatementDeleteDelta;
@@ -67,6 +82,6 @@ public class PscStatementDeltaProcessor {
         }
         apiClientService.invokePscStatementDeleteHandler(contextId, pscStatementDeleteDelta.getCompanyNumber(),
                 pscStatementDeleteDelta.getPscStatementId());
-
     }
 }
+

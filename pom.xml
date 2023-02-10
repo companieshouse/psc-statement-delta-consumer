@@ -29,6 +29,7 @@
         <jib-maven-plugin.version>3.1.1</jib-maven-plugin.version>
         <io-cucumber.version>7.2.3</io-cucumber.version>
         <springfox-boot-starter.version>3.0.0</springfox-boot-starter.version>
+        <api-helper-java-library.version>1.4.5</api-helper-java-library.version>
 
 
         <!-- Tests -->
@@ -101,6 +102,11 @@
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>kafka-models</artifactId>
             <version>${kafka-models.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>uk.gov.companieshouse</groupId>
+            <artifactId>api-helper-java</artifactId>
+            <version>${api-helper-java-library.version}</version>
         </dependency>
         <dependency>
             <groupId>uk.gov.companieshouse</groupId>
@@ -414,6 +420,11 @@
                     <failsOnError>true</failsOnError>
                     <failOnViolation>true</failOnViolation>
                     <configLocation>src/main/resources/checkstyle.xml</configLocation>
+                    <compilerArgs>
+                        <compilerArg>
+                            -Amapstruct.defaultComponentModel=spring
+                        </compilerArg>
+                    </compilerArgs>
                 </configuration>
                 <dependencies>
                     <dependency>
