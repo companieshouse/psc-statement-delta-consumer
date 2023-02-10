@@ -14,6 +14,7 @@ import uk.gov.companieshouse.api.psc.CompanyPscStatement;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.pscstatement.delta.exception.NonRetryableErrorException;
+import uk.gov.companieshouse.pscstatement.delta.service.ApiClientService;
 import uk.gov.companieshouse.pscstatement.delta.transformer.PscStatementApiTransformer;
 import uk.gov.companieshouse.pscstatement.delta.utils.TestHelper;
 
@@ -34,6 +35,9 @@ public class PscStatementProcessorTest {
     private Logger logger;
 
     @Mock
+    private ApiClientService apiClientService;
+
+    @Mock
     private PscStatementApiTransformer transformer;
 
     @Mock
@@ -41,7 +45,7 @@ public class PscStatementProcessorTest {
 
     @BeforeEach
     void setUp() {
-        deltaProcessor = new PscStatementDeltaProcessor(transformer, logger);
+        deltaProcessor = new PscStatementDeltaProcessor(logger, apiClientService, transformer);
     }
 
     @Test
@@ -53,9 +57,22 @@ public class PscStatementProcessorTest {
     @Test
     @DisplayName("Confirms the Processor does not throw when a valid ChsDelta is given")
     void When_ValidChsDeltaMessage_Expect_ProcessorDoesNotThrow_CallsTransformer() throws IOException {
-        Message<ChsDelta> mockChsDeltaMessage = testHelper.createChsDeltaMessage();
+        Message<ChsDelta> mockChsDeltaMessage = testHelper.createChsDeltaMessage(false);
         when(transformer.transform(any(PscStatement.class))).thenReturn(mockCompanyPscStatement);
         Assertions.assertDoesNotThrow(() -> deltaProcessor.processDelta(mockChsDeltaMessage));
         verify(transformer).transform(any(PscStatement.class));
+    }
+
+    @Test
+    void When_InvalidChsDeleteDeltaMessage_Expect_NonRetryableError() {
+        Message<ChsDelta> mockChsDeltaMessage = testHelper.createInvalidChsDeltaMessage();
+        assertThrows(NonRetryableErrorException.class, ()->deltaProcessor.processDeleteDelta(mockChsDeltaMessage));
+    }
+
+    @Test
+    @DisplayName("Confirms the Processor does not throw when a valid delete ChsDelta is given")
+    void When_ValidChsDeleteDeltaMessage_Expect_ProcessorDoesNotThrow() throws IOException {
+        Message<ChsDelta> mockChsDeltaMessage = testHelper.createChsDeltaMessage(true);
+        Assertions.assertDoesNotThrow(() -> deltaProcessor.processDeleteDelta(mockChsDeltaMessage));
     }
 }

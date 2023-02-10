@@ -4,7 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,29 +16,41 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import uk.gov.companieshouse.delta.ChsDelta;
+import uk.gov.companieshouse.logging.Logger;
+import uk.gov.companieshouse.pscstatement.delta.exception.RetryableErrorInterceptor;
 import uk.gov.companieshouse.pscstatement.delta.serialization.ChsDeltaDeserializer;
+import uk.gov.companieshouse.pscstatement.delta.serialization.ChsDeltaSerializer;
 
 @Configuration
 @EnableKafka
 @Profile("!test")
 public class KafkaConfig {
 
+    @Autowired
+    private Logger logger;
     private final String bootstrapServers;
     private final Integer listenerConcurrency;
     private  final ChsDeltaDeserializer chsDeltaDeserializer;
 
+    private final ChsDeltaSerializer chsDeltaSerializer;
+
     /**
      * Constructor.
      */
-    public KafkaConfig(ChsDeltaDeserializer chsDeltaDeserializer,
+    public KafkaConfig(ChsDeltaDeserializer chsDeltaDeserializer, ChsDeltaSerializer chsDeltaSerializer,
                        @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers,
                        @Value("${spring.kafka.listener.concurrency}") Integer listenerConcurrency) {
         this.bootstrapServers = bootstrapServers;
         this.listenerConcurrency = listenerConcurrency;
         this.chsDeltaDeserializer = chsDeltaDeserializer;
+        this.chsDeltaSerializer = chsDeltaSerializer;
+
     }
 
     /**
@@ -45,6 +60,22 @@ public class KafkaConfig {
     public ConsumerFactory<String, ChsDelta> kafkaConsumerFactory() {
         return new DefaultKafkaConsumerFactory<>(consumerConfigs(), new StringDeserializer(),
                 new ErrorHandlingDeserializer<>(chsDeltaDeserializer));
+    }
+
+    /**
+     * Kafka producer Factory.
+     */
+    @Bean
+    public ProducerFactory<String, Object> kafkaProducerFactory() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ChsDeltaSerializer.class);
+        props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG,
+                RetryableErrorInterceptor.class.getName());
+        DefaultKafkaProducerFactory<String, Object> factory = new DefaultKafkaProducerFactory<>(
+                props, new StringSerializer(), chsDeltaSerializer);
+        return factory;
     }
 
     /**
@@ -60,6 +91,14 @@ public class KafkaConfig {
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
 
         return factory;
+    }
+
+    /**
+     * Kafka producer Container Factory.
+     */
+    @Bean
+    public KafkaTemplate<String, Object> kafkaTemplate() {
+        return new KafkaTemplate<>(kafkaProducerFactory());
     }
 
     private Map<String, Object> consumerConfigs() {

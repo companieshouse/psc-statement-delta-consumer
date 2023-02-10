@@ -1,9 +1,6 @@
 package uk.gov.companieshouse.pscstatement.delta.consumer;
 
-import static java.lang.String.format;
-
 import java.time.Instant;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
@@ -52,12 +49,10 @@ public class PscStatementDeltaConsumer {
                                     @Header(KafkaHeaders.OFFSET) String offset) {
         Instant startTime = Instant.now();
         ChsDelta chsDelta = message.getPayload();
-        try {
+        if (chsDelta.getIsDelete()) {
+            deltaProcessor.processDeleteDelta(message);
+        } else {
             deltaProcessor.processDelta(message);
-        } catch (Exception exception) {
-            logger.error(format("Exception occurred while processing "
-                    + "message on the topic: %s", topic), exception, null);
-            throw exception;
         }
     }
 }

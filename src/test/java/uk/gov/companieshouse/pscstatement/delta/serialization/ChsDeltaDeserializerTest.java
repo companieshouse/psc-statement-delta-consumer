@@ -35,7 +35,7 @@ public class ChsDeltaDeserializerTest {
         ChsDelta deserializedObject = deserializer.deserialize("", data);
 
         Assertions.assertThat(deserializedObject).isInstanceOf(ChsDelta.class);
-        ChsDelta delta = testHelper.createChsDelta();
+        ChsDelta delta = testHelper.createChsDelta(false);
         Assertions.assertThat(deserializedObject).isEqualTo(delta);
     }
 
