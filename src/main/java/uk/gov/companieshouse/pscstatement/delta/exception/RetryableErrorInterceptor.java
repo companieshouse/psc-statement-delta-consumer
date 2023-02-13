@@ -13,12 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.companieshouse.logging.Logger;
 
 public class RetryableErrorInterceptor implements ProducerInterceptor<String, Object> {
-    private Logger logger;
 
     @Autowired
-    public RetryableErrorInterceptor(Logger logger) {
-        this.logger = logger;
-    }
+    private Logger logger;
 
     @Override
     public ProducerRecord<String, Object> onSend(ProducerRecord<String, Object> record) {
