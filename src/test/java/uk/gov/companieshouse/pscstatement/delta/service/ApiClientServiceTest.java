@@ -24,7 +24,7 @@ public class ApiClientServiceTest {
   private final String companyNumber = "test12345";
   private final String statementId = "testId123456";
 
-  private final String uri = "/company/%s/persons-with-significant-control-statement/%s/internal";
+  private final String uri = "/company/%s/persons-with-significant-control-statements/%s/internal";
 
   private ApiClientService apiClientService;
 
