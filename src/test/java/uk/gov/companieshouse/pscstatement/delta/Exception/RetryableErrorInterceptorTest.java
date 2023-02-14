@@ -4,15 +4,15 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.companieshouse.logging.Logger;
+import uk.gov.companieshouse.pscstatement.delta.config.LoggingConfig;
 import uk.gov.companieshouse.pscstatement.delta.exception.NonRetryableErrorException;
 import uk.gov.companieshouse.pscstatement.delta.exception.RetryableErrorException;
 import uk.gov.companieshouse.pscstatement.delta.exception.RetryableErrorInterceptor;
 import uk.gov.companieshouse.pscstatement.delta.utils.TestHelper;
 import static org.junit.Assert.assertEquals;
-
 
 @ExtendWith(MockitoExtension.class)
 public class RetryableErrorInterceptorTest {
@@ -21,13 +21,17 @@ public class RetryableErrorInterceptorTest {
 
     private TestHelper testHelper;
 
-    @Mock
     private Logger logger;
+
+    private LoggingConfig loggingConfig;
 
     @BeforeEach
     public void setUp() {
-        retryableErrorInterceptor = new RetryableErrorInterceptor(logger);
+        retryableErrorInterceptor = new RetryableErrorInterceptor();
         testHelper = new TestHelper();
+        loggingConfig = new LoggingConfig();
+        logger = loggingConfig.logger();
+        ReflectionTestUtils.setField(retryableErrorInterceptor,"logger",logger);
     }
 
     @Test
