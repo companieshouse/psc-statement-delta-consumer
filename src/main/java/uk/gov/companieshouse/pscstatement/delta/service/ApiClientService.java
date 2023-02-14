@@ -52,7 +52,7 @@ public class ApiClientService {
      * Invokes delete handler for psc statements.
      */
     public ApiResponse<Void> invokePscStatementDeleteHandler(String context, String companyNumber, String statementId) {
-        final String uri = String.format("/company/%s/persons-with-significant-control-statement/%s/internal",
+        final String uri = String.format("/company/%s/persons-with-significant-control-statements/%s/internal",
                 companyNumber, statementId);
         PscStatementsDelete deleteExecuteOp = getApiClient(context)
                 .privateDeltaResourceHandler()
