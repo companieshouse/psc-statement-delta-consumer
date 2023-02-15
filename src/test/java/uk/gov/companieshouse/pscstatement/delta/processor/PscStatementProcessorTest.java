@@ -9,11 +9,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.Message;
 
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.companieshouse.api.delta.PscStatement;
 import uk.gov.companieshouse.api.psc.CompanyPscStatement;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.pscstatement.delta.exception.NonRetryableErrorException;
+import uk.gov.companieshouse.pscstatement.delta.mapper.MapperUtils;
 import uk.gov.companieshouse.pscstatement.delta.service.ApiClientService;
 import uk.gov.companieshouse.pscstatement.delta.transformer.PscStatementApiTransformer;
 import uk.gov.companieshouse.pscstatement.delta.utils.TestHelper;
@@ -43,9 +45,13 @@ public class PscStatementProcessorTest {
     @Mock
     CompanyPscStatement mockCompanyPscStatement;
 
+    private MapperUtils mapperUtils;
+
     @BeforeEach
     void setUp() {
         deltaProcessor = new PscStatementDeltaProcessor(logger, apiClientService, transformer);
+        mapperUtils = new MapperUtils();
+        ReflectionTestUtils.setField(deltaProcessor,"mapperUtils",mapperUtils);
     }
 
     @Test
