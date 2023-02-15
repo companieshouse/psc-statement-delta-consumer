@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.Message;
 
@@ -26,6 +27,7 @@ import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -73,6 +75,8 @@ public class PscStatementProcessorTest {
     void When_InvalidChsDeleteDeltaMessage_Expect_NonRetryableError() {
         Message<ChsDelta> mockChsDeltaMessage = testHelper.createInvalidChsDeltaMessage();
         assertThrows(NonRetryableErrorException.class, ()->deltaProcessor.processDeleteDelta(mockChsDeltaMessage));
+        Mockito.verify(apiClientService, times(0)).
+                invokePscStatementDeleteHandler(any(),any(),any());
     }
 
     @Test
@@ -80,5 +84,7 @@ public class PscStatementProcessorTest {
     void When_ValidChsDeleteDeltaMessage_Expect_ProcessorDoesNotThrow() throws IOException {
         Message<ChsDelta> mockChsDeltaMessage = testHelper.createChsDeltaMessage(true);
         Assertions.assertDoesNotThrow(() -> deltaProcessor.processDeleteDelta(mockChsDeltaMessage));
+        Mockito.verify(apiClientService, times(1)).
+                invokePscStatementDeleteHandler(any(),any(),any());
     }
 }
