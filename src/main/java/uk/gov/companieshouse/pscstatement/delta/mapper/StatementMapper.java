@@ -18,6 +18,7 @@ import uk.gov.companieshouse.api.psc.StatementLinksType;
 @Mapper(componentModel = "spring")
 public interface StatementMapper {
 
+    MapperUtils mapperUtils = new MapperUtils();
     String SET_KIND = "setKind";
     String SET_STATEMENT = "setStatement";
     String SET_DESCRIPTION = "setDescription";
@@ -42,7 +43,7 @@ public interface StatementMapper {
 
     @AfterMapping 
     default void mapLinks(@MappingTarget Statement target, PscStatement source) {
-        String encodedId = MapperUtils.encode(source.getPscStatementId());
+        String encodedId = mapperUtils.encode(source.getPscStatementId());
         StatementLinksType links = new StatementLinksType();
         links.setSelf(String
                 .format("/company/%s/persons-with-significant-control-statements/%s", 
@@ -50,7 +51,7 @@ public interface StatementMapper {
                 encodedId)); 
 
         if (source.getLinkedPsc() != null) {
-            String encodedNotificationId = MapperUtils
+            String encodedNotificationId = mapperUtils
                     .encode(source.getLinkedPsc().getNotificationId());
             links.setPersonWithSignificantControl(String
                     .format("/company/%s/persons-with-significant-control/%s/%s", 
@@ -75,7 +76,7 @@ public interface StatementMapper {
                             linkedPsc.getHonours())
                     .filter(s -> s != null && !s.isEmpty()).collect(Collectors.joining(" "));
             target.setLinkedPscName(fullName);
-            target.setNotificationId(MapperUtils.encode(linkedPsc.getNotificationId()));
+            target.setNotificationId(mapperUtils.encode(linkedPsc.getNotificationId()));
         }
     }
 

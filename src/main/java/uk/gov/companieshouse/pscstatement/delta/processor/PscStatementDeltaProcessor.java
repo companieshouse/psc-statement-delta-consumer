@@ -27,6 +27,9 @@ public class PscStatementDeltaProcessor {
 
     private ApiClientService apiClientService;
 
+    @Autowired
+    private MapperUtils mapperUtils;
+
     /**
      * processor constructor.
      */
@@ -81,7 +84,7 @@ public class PscStatementDeltaProcessor {
             throw new NonRetryableErrorException(
                     "Error when extracting psc-statement delete delta", ex);
         }
-        final String statementId = MapperUtils.encode(pscStatementDeleteDelta.getPscStatementId());
+        final String statementId = mapperUtils.encode(pscStatementDeleteDelta.getPscStatementId());
         apiClientService.invokePscStatementDeleteHandler(contextId, pscStatementDeleteDelta.getCompanyNumber(),
                 statementId);
     }
