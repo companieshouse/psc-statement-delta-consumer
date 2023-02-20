@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -43,7 +44,7 @@ public interface StatementMapper {
 
     @AfterMapping
     default void mapRestrictionsNoticeWithdrawalReason(@MappingTarget Statement target, PscStatement source) {
-        if (source.getRestrictionsNoticeReason() != null) {
+        if (!StringUtils.isBlank(source.getRestrictionsNoticeReason())) {
             Map<String, String> restrictionsNoticeWithdrawalReasons = Map.ofEntries(
                     Map.entry("1", "restrictions-notice-withdrawn-by-company"),
                     Map.entry("2", "restrictions-notice-withdrawn-by-court-order"),
