@@ -1,6 +1,7 @@
 package uk.gov.companieshouse.pscstatement.delta.transformer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -14,6 +15,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.companieshouse.api.delta.PscStatement;
 import uk.gov.companieshouse.api.psc.CompanyPscStatement;
 import uk.gov.companieshouse.api.psc.Statement;
+import uk.gov.companieshouse.pscstatement.delta.exception.NonRetryableErrorException;
 import uk.gov.companieshouse.pscstatement.delta.mapper.MapperUtils;
 import uk.gov.companieshouse.pscstatement.delta.mapper.StatementMapper;
 
@@ -48,5 +50,11 @@ public class PscStatementApiTransformerTest {
         assertEquals(expectedCPS, actualCompanyPscStatement);
     }
 
-    
+    @Test
+    public void transformerThrowsExceptionCompanyPscStatement() {
+        when(mapper.pscStatementToStatement(pscStatement)).thenThrow(NonRetryableErrorException.class);
+
+        assertThrows(NonRetryableErrorException.class, ()->
+                transformer.transform(pscStatement));
+    }
 }
