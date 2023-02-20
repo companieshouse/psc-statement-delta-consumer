@@ -8,7 +8,6 @@ import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValueCheckStrategy;
 
 import uk.gov.companieshouse.GenerateEtagUtil;
 import uk.gov.companieshouse.api.delta.LinkedPsc;
@@ -21,14 +20,6 @@ import uk.gov.companieshouse.api.psc.StatementLinksType;
 public interface StatementMapper {
 
     MapperUtils mapperUtils = new MapperUtils();
-    Map<String, String> restrictionsNoticeWithdrawalReasons = Map.ofEntries(
-            Map.entry("1", "restrictions-notice-withdrawn-by-company"),
-            Map.entry("2", "restrictions-notice-withdrawn-by-court-order"),
-            Map.entry("3", "restrictions-notice-withdrawn-by-lp"),
-            Map.entry("4", "restrictions-notice-withdrawn-by-court-order-lp"),
-            Map.entry("5", "restrictions-notice-withdrawn-by-partnership"),
-            Map.entry("6", "restrictions-notice-withdrawn-by-court-order-p")
-    );
     String SET_KIND = "setKind";
     String SET_STATEMENT = "setStatement";
     String SET_DESCRIPTION = "setDescription";
@@ -39,8 +30,6 @@ public interface StatementMapper {
     @Mapping(target = "links", source = "companyNumber", ignore = true)
     @Mapping(target = "linkedPscName", source = "linkedPsc.surname", ignore = true)
     @Mapping(target = "notifiedOn", source = "submittedOn", dateFormat = "yyyyMMdd")
-    @Mapping(target = "restrictionsNoticeWithdrawalReason", source = "restrictionsNoticeReason",
-            nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
     @Mapping(target = "notificationId", source = "linkedPsc.notificationId", ignore = true)
     @Mapping(target = "statement", source = "statement")
     Statement pscStatementToStatement(PscStatement pscStatement);
@@ -53,10 +42,18 @@ public interface StatementMapper {
     /** Manually map restrictions notice withdrawal reasons. */
 
     @AfterMapping
-    default void mapRestrictionsNoticeWithdrawalReason(@MappingTarget Statement target) {
-        if (target.getRestrictionsNoticeWithdrawalReason() != null) {
+    default void mapRestrictionsNoticeWithdrawalReason(@MappingTarget Statement target, PscStatement source) {
+        if (source.getRestrictionsNoticeReason() != null) {
+            Map<String, String> restrictionsNoticeWithdrawalReasons = Map.ofEntries(
+                    Map.entry("1", "restrictions-notice-withdrawn-by-company"),
+                    Map.entry("2", "restrictions-notice-withdrawn-by-court-order"),
+                    Map.entry("3", "restrictions-notice-withdrawn-by-lp"),
+                    Map.entry("4", "restrictions-notice-withdrawn-by-court-order-lp"),
+                    Map.entry("5", "restrictions-notice-withdrawn-by-partnership"),
+                    Map.entry("6", "restrictions-notice-withdrawn-by-court-order-p")
+            );
             target.setRestrictionsNoticeWithdrawalReason(
-                    restrictionsNoticeWithdrawalReasons.get(target.getRestrictionsNoticeWithdrawalReason()));
+                    restrictionsNoticeWithdrawalReasons.get(source.getRestrictionsNoticeReason()));
         }
     }
 
