@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.companieshouse.api.InternalApiClient;
 import uk.gov.companieshouse.api.handler.delta.pscstatements.request.PscStatementsDelete;
+import uk.gov.companieshouse.api.handler.delta.pscstatements.request.PscStatementsPut;
 import uk.gov.companieshouse.api.http.ApiKeyHttpClient;
 import uk.gov.companieshouse.api.model.ApiResponse;
+import uk.gov.companieshouse.api.psc.CompanyPscStatement;
 import uk.gov.companieshouse.logging.Logger;
 
 @Service
@@ -22,12 +24,9 @@ public class ApiClientService {
 
     private Logger logger;
 
-    ResponseHandler responseHandler;
-
     @Autowired
-    public ApiClientService(Logger logger, ResponseHandler responseHandler) {
+    public ApiClientService(Logger logger) {
         this.logger = logger;
-        this.responseHandler = responseHandler;
     }
 
     /**
@@ -49,10 +48,25 @@ public class ApiClientService {
     }
 
     /**
+     * Invokes put handler for psc statements.
+     */
+    public ApiResponse<Void> invokePscStatementPutHandler(String context, String companyNumber, String statementId, CompanyPscStatement statement) {
+        ResponseHandler<PscStatementsPut> responseHandler = new ResponseHandler<>();
+        final String uri = String.format("/company/%s/persons-with-significant-control-statements/%s/internal", companyNumber, statementId);
+        PscStatementsPut putExecuteOp = getApiClient(context).privateDeltaResourceHandler().putPscStatements(uri, statement);
+
+        Map<String, Object> logMap = createLogMap(companyNumber, statementId, "PUT", uri);
+        logger.infoContext(context, String.format("PUT %s", uri), logMap);
+        
+        return responseHandler.handleApiResponse(logger, context, "putPscStatement", uri, putExecuteOp);
+    }
+
+    /**
      * Invokes delete handler for psc statements.
      */
     public ApiResponse<Void> invokePscStatementDeleteHandler(String context, String companyNumber, String statementId) {
-        final String uri = String.format("/company/%s/persons-with-significant-control-statement/%s/internal",
+        ResponseHandler<PscStatementsDelete> responseHandler = new ResponseHandler<>();
+        final String uri = String.format("/company/%s/persons-with-significant-control-statements/%s/internal",
                 companyNumber, statementId);
         PscStatementsDelete deleteExecuteOp = getApiClient(context)
                 .privateDeltaResourceHandler()

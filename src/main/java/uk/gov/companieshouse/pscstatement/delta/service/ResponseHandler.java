@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.springframework.stereotype.Service;
 import uk.gov.companieshouse.api.error.ApiErrorResponseException;
-import uk.gov.companieshouse.api.handler.delta.pscstatements.request.PscStatementsDelete;
+import uk.gov.companieshouse.api.handler.Executor;
 import uk.gov.companieshouse.api.handler.exception.URIValidationException;
 import uk.gov.companieshouse.api.model.ApiResponse;
 import uk.gov.companieshouse.logging.Logger;
@@ -12,19 +12,19 @@ import uk.gov.companieshouse.pscstatement.delta.exception.NonRetryableErrorExcep
 import uk.gov.companieshouse.pscstatement.delta.exception.RetryableErrorException;
 
 @Service
-public class ResponseHandler {
+public class ResponseHandler<T> {
 
     /**
      * Handle response from data api.
      */
     public ApiResponse<Void> handleApiResponse(Logger logger, String context, String operation,
-                                               String uri, PscStatementsDelete delete) {
+                                               String uri, T executor) {
         final Map<String, Object> logMap = new HashMap<>();
         logMap.put("operation_name", operation);
         logMap.put("path", uri);
 
         try {
-            return delete.execute();
+            return (ApiResponse<Void>) ((Executor<T>) executor).execute();
 
         } catch (URIValidationException ex) {
             String msg = "Invalid path specified";
