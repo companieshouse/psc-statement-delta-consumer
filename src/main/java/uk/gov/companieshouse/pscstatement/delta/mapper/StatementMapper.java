@@ -1,8 +1,10 @@
 package uk.gov.companieshouse.pscstatement.delta.mapper;
 
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -18,6 +20,7 @@ import uk.gov.companieshouse.api.psc.StatementLinksType;
 @Mapper(componentModel = "spring")
 public interface StatementMapper {
 
+    MapperUtils mapperUtils = new MapperUtils();
     String SET_KIND = "setKind";
     String SET_STATEMENT = "setStatement";
     String SET_DESCRIPTION = "setDescription";
@@ -28,7 +31,6 @@ public interface StatementMapper {
     @Mapping(target = "links", source = "companyNumber", ignore = true)
     @Mapping(target = "linkedPscName", source = "linkedPsc.surname", ignore = true)
     @Mapping(target = "notifiedOn", source = "submittedOn", dateFormat = "yyyyMMdd")
-    @Mapping(target = "restrictionsNoticeWithdrawalReason", source = "restrictionsNoticeReason")
     @Mapping(target = "notificationId", source = "linkedPsc.notificationId", ignore = true)
     @Mapping(target = "statement", source = "statement")
     Statement pscStatementToStatement(PscStatement pscStatement);
@@ -38,11 +40,29 @@ public interface StatementMapper {
         target.setEtag(GenerateEtagUtil.generateEtag());
     }
 
+    /** Manually map restrictions notice withdrawal reasons. */
+
+    @AfterMapping
+    default void mapRestrictionsNoticeWithdrawalReason(@MappingTarget Statement target, PscStatement source) {
+        if (!StringUtils.isBlank(source.getRestrictionsNoticeReason())) {
+            Map<String, String> restrictionsNoticeWithdrawalReasons = Map.ofEntries(
+                    Map.entry("1", "restrictions-notice-withdrawn-by-company"),
+                    Map.entry("2", "restrictions-notice-withdrawn-by-court-order"),
+                    Map.entry("3", "restrictions-notice-withdrawn-by-lp"),
+                    Map.entry("4", "restrictions-notice-withdrawn-by-court-order-lp"),
+                    Map.entry("5", "restrictions-notice-withdrawn-by-partnership"),
+                    Map.entry("6", "restrictions-notice-withdrawn-by-court-order-p")
+            );
+            target.setRestrictionsNoticeWithdrawalReason(
+                    restrictionsNoticeWithdrawalReasons.get(source.getRestrictionsNoticeReason()));
+        }
+    }
+
     /** Manually map linkedPsc. */
 
     @AfterMapping 
     default void mapLinks(@MappingTarget Statement target, PscStatement source) {
-        String encodedId = MapperUtils.encode(source.getPscStatementId());
+        String encodedId = mapperUtils.encode(source.getPscStatementId());
         StatementLinksType links = new StatementLinksType();
         links.setSelf(String
                 .format("/company/%s/persons-with-significant-control-statements/%s", 
@@ -50,7 +70,7 @@ public interface StatementMapper {
                 encodedId)); 
 
         if (source.getLinkedPsc() != null) {
-            String encodedNotificationId = MapperUtils
+            String encodedNotificationId = mapperUtils
                     .encode(source.getLinkedPsc().getNotificationId());
             links.setPersonWithSignificantControl(String
                     .format("/company/%s/persons-with-significant-control/%s/%s", 
@@ -75,7 +95,7 @@ public interface StatementMapper {
                             linkedPsc.getHonours())
                     .filter(s -> s != null && !s.isEmpty()).collect(Collectors.joining(" "));
             target.setLinkedPscName(fullName);
-            target.setNotificationId(MapperUtils.encode(linkedPsc.getNotificationId()));
+            target.setNotificationId(mapperUtils.encode(linkedPsc.getNotificationId()));
         }
     }
 

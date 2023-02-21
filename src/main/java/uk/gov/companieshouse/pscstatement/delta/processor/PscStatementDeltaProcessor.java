@@ -15,6 +15,7 @@ import uk.gov.companieshouse.api.psc.CompanyPscStatement;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.pscstatement.delta.exception.NonRetryableErrorException;
+import uk.gov.companieshouse.pscstatement.delta.mapper.MapperUtils;
 import uk.gov.companieshouse.pscstatement.delta.service.ApiClientService;
 import uk.gov.companieshouse.pscstatement.delta.transformer.PscStatementApiTransformer;
 
@@ -25,6 +26,9 @@ public class PscStatementDeltaProcessor {
     private final Logger logger;
 
     private ApiClientService apiClientService;
+
+    @Autowired
+    private MapperUtils mapperUtils;
 
     /**
      * processor constructor.
@@ -80,8 +84,9 @@ public class PscStatementDeltaProcessor {
             throw new NonRetryableErrorException(
                     "Error when extracting psc-statement delete delta", ex);
         }
+        final String statementId = mapperUtils.encode(pscStatementDeleteDelta.getPscStatementId());
         apiClientService.invokePscStatementDeleteHandler(contextId, pscStatementDeleteDelta.getCompanyNumber(),
-                pscStatementDeleteDelta.getPscStatementId());
+                statementId);
     }
 }
 

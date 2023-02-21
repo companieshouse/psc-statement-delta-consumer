@@ -15,6 +15,9 @@ import uk.gov.companieshouse.pscstatement.delta.mapper.StatementMapper;
 public class PscStatementApiTransformer {
 
     private final StatementMapper mapper;
+
+    @Autowired
+    private MapperUtils mapperUtils;
     
     /**constructor. */
     @Autowired
@@ -28,7 +31,7 @@ public class PscStatementApiTransformer {
             Statement statement = mapper.pscStatementToStatement(pscStatement);
             CompanyPscStatement companyPscStatement = new CompanyPscStatement();
             companyPscStatement.setCompanyNumber(pscStatement.getCompanyNumber());
-            companyPscStatement.setPscStatementId(MapperUtils
+            companyPscStatement.setPscStatementId(mapperUtils
                     .encode(pscStatement.getPscStatementId()));
             companyPscStatement.setStatement(statement);
             return companyPscStatement;
