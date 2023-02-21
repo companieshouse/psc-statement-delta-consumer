@@ -63,7 +63,7 @@ public class StatementMapperTest {
         expectedResult.setLinkedPscName("Mr Faxrivulet Congresspersonliquor");
         expectedResult.setNotificationId("Uuiit_lN49JBa-Jp3bqNLsa3UG8");
         expectedResult.setLinks(links);
-        expectedResult.setRestrictionsNoticeWithdrawalReason(null);
+        expectedResult.setRestrictionsNoticeWithdrawalReason("restrictions-notice-withdrawn-by-company");
 
         assertEquals(statement.getCeasedOn(), LocalDate.of(2023, 1, 27));
         assertEquals(expectedResult, statement);

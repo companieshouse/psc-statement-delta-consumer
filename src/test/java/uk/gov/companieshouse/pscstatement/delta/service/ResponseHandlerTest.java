@@ -2,7 +2,7 @@ package uk.gov.companieshouse.pscstatement.delta.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpResponseException;
@@ -80,5 +80,17 @@ public class ResponseHandlerTest {
                     handleApiResponse(logger, null,null,null, pscStatementsDelete);
         });
         assertEquals("server error with 404 NOT_FOUND returned from psc-statements-data-api", thrown.getMessage());
+    }
+
+    @Test
+    public void throwErrorResponseOn500() {
+        ResponseHandler spyHandler = spy(responseHandler);
+        doThrow(RetryableErrorException.class).when(spyHandler).handleApiResponse(logger, null,
+                null, null, pscStatementsDelete);
+
+        RetryableErrorException thrown = assertThrows(RetryableErrorException.class, ()-> {
+            spyHandler.
+                    handleApiResponse(logger, null,null,null, pscStatementsDelete);
+        });
     }
 }
