@@ -11,6 +11,7 @@ import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.pscstatement.delta.exception.NonRetryableErrorException;
 import uk.gov.companieshouse.pscstatement.delta.exception.RetryableErrorException;
 
+@SuppressWarnings("unchecked")
 @Service
 public class ResponseHandler<T> {
 

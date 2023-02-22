@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.companieshouse.api.handler.delta.pscstatements.request.PscStatementsDelete;
@@ -35,17 +34,23 @@ public class ApiClientServiceTest {
   private Logger logger;
 
   @Mock
+  private ResponseHandlerFactory responseHandlerFactory;
+
+  @Mock
   private ApiResponse<Void> apiResponse;
 
   @Mock
   ResponseHandler<PscStatementsDelete> deleteResponseHandler;
 
   @Mock
+  ResponseHandler<PscStatementsPut> putResponseHandler;
+
+  @Mock
   CompanyPscStatement statement;
 
   @BeforeEach
   public void setUp(){
-    apiClientService = new ApiClientService(logger);
+    apiClientService = new ApiClientService(logger, responseHandlerFactory);
     ReflectionTestUtils.setField(apiClientService, "apiKey", "testKey");
     ReflectionTestUtils.setField(apiClientService, "url", "http://localhost:8888");
   }
@@ -53,8 +58,7 @@ public class ApiClientServiceTest {
   @Test
   public void returnOkResponseWhenValidPutRequestSentToApi(){
     String expectedUri = String.format(uri, companyNumber, statementId);
-    ResponseHandler<PscStatementsPut> putResponseHandler = Mockito.mock(ResponseHandler.class);
-    ReflectionTestUtils.setField(apiClientService, "responseHandler", putResponseHandler);
+    when(responseHandlerFactory.createResponseHandler(any())).thenReturn(putResponseHandler);
     when(putResponseHandler.handleApiResponse(any(),anyString(),
             anyString(),anyString(),
             any(PscStatementsPut.class))).thenReturn(apiResponse);
@@ -69,6 +73,7 @@ public class ApiClientServiceTest {
   @Test
   public void returnOkResponseWhenValidDeleteRequestSentToApi() {
     String expectedUri = String.format(uri, companyNumber, statementId);
+    when(responseHandlerFactory.createResponseHandler(any())).thenReturn(deleteResponseHandler);
     when(deleteResponseHandler.handleApiResponse(any(),anyString(),
             anyString(),anyString(),
             any(PscStatementsDelete.class))).thenReturn(apiResponse);

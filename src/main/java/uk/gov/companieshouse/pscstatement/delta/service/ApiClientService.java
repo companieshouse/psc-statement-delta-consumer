@@ -14,6 +14,7 @@ import uk.gov.companieshouse.api.psc.CompanyPscStatement;
 import uk.gov.companieshouse.logging.Logger;
 
 @Service
+@SuppressWarnings("unchecked")
 public class ApiClientService {
 
     @Value("${api.psc-statements-data-api-key}")
@@ -24,9 +25,12 @@ public class ApiClientService {
 
     private Logger logger;
 
+    private ResponseHandlerFactory responseHandlerFactory;
+
     @Autowired
-    public ApiClientService(Logger logger) {
+    public ApiClientService(Logger logger, ResponseHandlerFactory responseHandlerFactory) {
         this.logger = logger;
+        this.responseHandlerFactory = responseHandlerFactory;
     }
 
     /**
@@ -50,14 +54,21 @@ public class ApiClientService {
     /**
      * Invokes put handler for psc statements.
      */
-    public ApiResponse<Void> invokePscStatementPutHandler(String context, String companyNumber, String statementId, CompanyPscStatement statement) {
-        ResponseHandler<PscStatementsPut> responseHandler = new ResponseHandler<>();
-        final String uri = String.format("/company/%s/persons-with-significant-control-statements/%s/internal", companyNumber, statementId);
-        PscStatementsPut putExecuteOp = getApiClient(context).privateDeltaResourceHandler().putPscStatements(uri, statement);
+    public ApiResponse<Void> invokePscStatementPutHandler(String context, String companyNumber, 
+            String statementId, CompanyPscStatement statement) {
+        final String uri = String.format(
+                "/company/%s/persons-with-significant-control-statements/%s/internal",
+                companyNumber,
+                statementId);
+        PscStatementsPut putExecuteOp = getApiClient(context)
+                .privateDeltaResourceHandler()
+                .putPscStatements(uri, statement);
 
         Map<String, Object> logMap = createLogMap(companyNumber, statementId, "PUT", uri);
         logger.infoContext(context, String.format("PUT %s", uri), logMap);
         
+        ResponseHandler<PscStatementsPut> responseHandler = 
+                (ResponseHandler<PscStatementsPut>) responseHandlerFactory.createResponseHandler(putExecuteOp);
         return responseHandler.handleApiResponse(logger, context, "putPscStatement", uri, putExecuteOp);
     }
 
@@ -65,7 +76,6 @@ public class ApiClientService {
      * Invokes delete handler for psc statements.
      */
     public ApiResponse<Void> invokePscStatementDeleteHandler(String context, String companyNumber, String statementId) {
-        ResponseHandler<PscStatementsDelete> responseHandler = new ResponseHandler<>();
         final String uri = String.format("/company/%s/persons-with-significant-control-statements/%s/internal",
                 companyNumber, statementId);
         PscStatementsDelete deleteExecuteOp = getApiClient(context)
@@ -74,6 +84,9 @@ public class ApiClientService {
 
         Map<String,Object> logMap = createLogMap(companyNumber, statementId,"DELETE", uri);
         logger.infoContext(context, String.format("DELETE %s", uri), logMap);
+        ResponseHandler<PscStatementsDelete> responseHandler = 
+                (ResponseHandler<PscStatementsDelete>) responseHandlerFactory.createResponseHandler(deleteExecuteOp);
+
         return responseHandler.handleApiResponse(logger,context, "deletePscStatement", uri, deleteExecuteOp);
     }
 

@@ -47,6 +47,8 @@ public class PscStatementDeltaProcessor {
     public void processDelta(Message<ChsDelta> chsDelta) {
         final MessageHeaders headers = chsDelta.getHeaders();
         final ChsDelta payload = chsDelta.getPayload();
+        final String contextId = payload.getContextId();
+        CompanyPscStatement companyPscStatement = new CompanyPscStatement();
         logger.info(format("Successfully extracted Chs Delta with context_id %s",
                 payload.getContextId()));
         ObjectMapper mapper = new ObjectMapper();
@@ -58,7 +60,7 @@ public class PscStatementDeltaProcessor {
                     pscStatementDelta.toString()));
             List<PscStatement> statements = pscStatementDelta.getPscStatements();
             for (PscStatement pscStatement : statements) {
-                CompanyPscStatement companyPscStatement = transformer.transform(pscStatement);
+                companyPscStatement = transformer.transform(pscStatement);
                 companyPscStatement.setDeltaAt(pscStatementDelta.getDeltaAt());
                 logger.info(format("CompanyPscStatement: %s", companyPscStatement)); //remove
 
@@ -67,6 +69,9 @@ public class PscStatementDeltaProcessor {
             throw new NonRetryableErrorException(
                     "Error when extracting psc-statement delta", ex);
         }
+
+        apiClientService.invokePscStatementPutHandler(contextId, companyPscStatement.getCompanyNumber(),
+                companyPscStatement.getPscStatementId(), companyPscStatement);
     }
 
     /**
