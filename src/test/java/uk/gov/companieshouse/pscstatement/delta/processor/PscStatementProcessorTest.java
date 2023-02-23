@@ -60,6 +60,8 @@ public class PscStatementProcessorTest {
     void When_InvalidChsDeltaMessage_Expect_NonRetryableError() {
         Message<ChsDelta> mockChsDeltaMessage = testHelper.createInvalidChsDeltaMessage();
         assertThrows(NonRetryableErrorException.class, ()->deltaProcessor.processDelta(mockChsDeltaMessage));
+        Mockito.verify(apiClientService, times(0)).
+                invokePscStatementPutHandler(any(),any(),any(), any());
     }
 
     @Test
@@ -69,6 +71,9 @@ public class PscStatementProcessorTest {
         when(transformer.transform(any(PscStatement.class))).thenReturn(mockCompanyPscStatement);
         Assertions.assertDoesNotThrow(() -> deltaProcessor.processDelta(mockChsDeltaMessage));
         verify(transformer).transform(any(PscStatement.class));
+        Mockito.verify(apiClientService, times(1)).
+                invokePscStatementPutHandler(any(),any(),any(), any());
+        
     }
 
     @Test
