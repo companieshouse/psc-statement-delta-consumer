@@ -1,2 +1,0 @@
-encoding:
-  salt: ${PSC_STATEMENT_SALT:salt}
