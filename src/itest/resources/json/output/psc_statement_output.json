@@ -1,0 +1,14 @@
+{
+  "psc_statement_id": "3000000002",
+  "delta_at": "20230723093435661593",
+  "company_number": "08694860",
+  "statement": {
+    "etag": "1fe0f033e49e55943f70da5a1fb46cc5c9fea46e",
+    "kind": "persons-with-significant-control-statement",
+    "notified_on": "20160314",
+    "statement": "no-individual-or-entity-with-signficant-control",
+    "links": {
+      "self": "/company/08694860/persons-with-significant-control-statements/3000000002"
+    }
+  }
+}

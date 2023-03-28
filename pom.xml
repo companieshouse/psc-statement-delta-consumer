@@ -133,12 +133,6 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-boot-starter</artifactId>
-            <version>${springfox-boot-starter.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
@@ -350,7 +344,7 @@
                     <argLine>-Dfile.encoding=UTF-8</argLine>
                     <argLine>${surefireArgLine}</argLine>
                     <excludes>
-                        <exclude>**/*ITest.java</exclude>
+                        <exclude>**/itest.java</exclude>
                     </excludes>
                     <skipTests>${skip.unit.tests}</skipTests>
                 </configuration>
@@ -375,7 +369,7 @@
                     <classesDirectory>${project.build.outputDirectory}</classesDirectory>
                     <skipITs>${skip.integration.tests}</skipITs>
                     <includes>
-                        <include>**/*ITest.java</include>
+                        <include>**/*itest.java</include>
                     </includes>
                 </configuration>
             </plugin>
@@ -420,11 +414,6 @@
                     <failsOnError>true</failsOnError>
                     <failOnViolation>true</failOnViolation>
                     <configLocation>src/main/resources/checkstyle.xml</configLocation>
-                    <compilerArgs>
-                        <compilerArg>
-                            -Amapstruct.defaultComponentModel=spring
-                        </compilerArg>
-                    </compilerArgs>
                 </configuration>
                 <dependencies>
                     <dependency>
