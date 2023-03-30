@@ -22,9 +22,6 @@ public abstract class StatementMapper {
 
     @Autowired
     protected MapperUtils mapperUtils;
-    String SET_KIND = "setKind";
-    String SET_STATEMENT = "setStatement";
-    String SET_DESCRIPTION = "setDescription";
 
     @Mapping(target = "ceasedOn", source = "ceasedOn", dateFormat = "yyyyMMdd")
     @Mapping(target = "kind", source = "statement", ignore = true)
