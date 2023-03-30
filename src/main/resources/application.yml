@@ -27,7 +27,7 @@ api:
   internal-api-url: ${INTERNAL_API_URL:localhost}
 
 encoding:
-  salt: ${PSC_STATEMENT_SALT}
+  salt: ${PSC_STATEMENT_SALT:salt}
 
 management:
   endpoints:

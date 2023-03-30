@@ -1,40 +1,47 @@
 package uk.gov.companieshouse.pscstatement.delta.matcher;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.http.RequestMethod;
 import com.github.tomakehurst.wiremock.matching.MatchResult;
 import com.github.tomakehurst.wiremock.matching.ValueMatcher;
+import org.json.JSONException;
+import org.json.JSONObject;
 import uk.gov.companieshouse.logging.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PscStatementMatcher implements ValueMatcher<Request> {
 
     private final String expectedOutput;
+    private final String expectedUrl;
+    private final List<String> fieldsToIgnore;
     private Logger logger;
-    private final String companyNumber;
-    private final String statementId;
 
-    public PscStatementMatcher(Logger logger, String output, String companyNumber, String statementId) {
+    public PscStatementMatcher(Logger logger, String output, String expectedUrl) {
         this.expectedOutput = output;
         this.logger = logger;
-        this.companyNumber = companyNumber;
-        this.statementId = statementId;
+        this.expectedUrl = expectedUrl;
+        this.fieldsToIgnore = new ArrayList<>();;
+    }
+
+    public PscStatementMatcher(Logger logger, String output, String expectedUrl, List<String> fieldsToIgnore) {
+        this.expectedOutput = output;
+        this.logger = logger;
+        this.expectedUrl = expectedUrl;
+        this.fieldsToIgnore = fieldsToIgnore;
     }
 
     @Override
     public MatchResult match(Request value) {
-
         return MatchResult.aggregate(matchUrl(value.getUrl()), matchMethod(value.getMethod()),
                 matchBody(value.getBodyAsString()));
     }
 
     private MatchResult matchUrl(String actualUrl) {
-        String expectedUrl = "/company/" + companyNumber +
-                "/persons-with-significant-control-statements/" + statementId;
 
         MatchResult urlResult = MatchResult.of(expectedUrl.equals(actualUrl));
+
 
         if (! urlResult.isExactMatch()) {
             logger.error("url does not match expected: <" + expectedUrl + "> actual: <" + actualUrl + ">");
@@ -57,31 +64,52 @@ public class PscStatementMatcher implements ValueMatcher<Request> {
 
     private MatchResult matchBody(String actualBody) {
 
-        ObjectMapper mapper = new ObjectMapper();
-
         MatchResult bodyResult;
-        JsonNode expectedBody;
+        JSONObject expectedBody;
         try {
-            expectedBody = mapper.readTree(expectedOutput);
-        } catch (JsonProcessingException e) {
+            expectedBody = new JSONObject(expectedOutput);
+        } catch (JSONException e) {
             logger.error("Could not process expectedBody JSON: " + e);
             return MatchResult.of(false);
         }
 
-        JsonNode actual;
+        JSONObject actual;
         try {
-            actual = mapper.readTree(actualBody);
-        } catch (JsonProcessingException e) {
+            actual = new JSONObject(actualBody);
+           fieldsToIgnore.forEach(fieldName ->{
+               try {
+                   removeField(actual, fieldName);
+               } catch (JSONException e) {
+                   throw new RuntimeException(e);
+               }
+           });
+
+        } catch (JSONException e) {
             logger.error("Could not process actualBody JSON: " + e);
             return MatchResult.of(false);
         }
 
-        bodyResult = MatchResult.of(expectedBody.equals(actual));
-
+        bodyResult = MatchResult.of(expectedBody.toString().equals(actual.toString()));
         if (! bodyResult.isExactMatch()) {
             logger.error("Body does not match expected: <" + expectedBody + "> actual: <" + actualBody + ">");
         }
 
         return bodyResult;
+    }
+
+    public JSONObject removeField(JSONObject json , String fieldName) throws JSONException {
+        String key = fieldName.split("\\.")[0];
+        if (json.has(fieldName)){
+            json.remove(key);
+        }
+        else if (json.has(key)) {
+            if (json.get(key) instanceof JSONObject) {
+                JSONObject value = json.getJSONObject(key);
+                removeField(value, fieldName.substring(fieldName.indexOf(".") + 1));
+            } else {
+                json.remove(key);
+            }
+        }
+        return json;
     }
 }
