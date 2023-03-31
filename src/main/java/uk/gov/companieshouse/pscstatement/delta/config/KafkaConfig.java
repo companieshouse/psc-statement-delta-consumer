@@ -1,5 +1,9 @@
 package uk.gov.companieshouse.pscstatement.delta.config;
 
+import consumer.deserialization.AvroDeserializer;
+import consumer.exception.TopicErrorInterceptor;
+import consumer.serialization.AvroSerializer;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,36 +25,30 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
+
 import uk.gov.companieshouse.delta.ChsDelta;
-import uk.gov.companieshouse.logging.Logger;
-import uk.gov.companieshouse.pscstatement.delta.exception.RetryableErrorInterceptor;
-import uk.gov.companieshouse.pscstatement.delta.serialization.ChsDeltaDeserializer;
-import uk.gov.companieshouse.pscstatement.delta.serialization.ChsDeltaSerializer;
 
 @Configuration
 @EnableKafka
 @Profile("!test")
 public class KafkaConfig {
 
-    @Autowired
-    private Logger logger;
     private final String bootstrapServers;
     private final Integer listenerConcurrency;
-    private  final ChsDeltaDeserializer chsDeltaDeserializer;
-
-    private final ChsDeltaSerializer chsDeltaSerializer;
+    private final AvroSerializer serializer;
+    private final AvroDeserializer<ChsDelta> deserializer;
 
     /**
      * Constructor.
      */
-    public KafkaConfig(ChsDeltaDeserializer chsDeltaDeserializer, ChsDeltaSerializer chsDeltaSerializer,
-                       @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers,
-                       @Value("${spring.kafka.listener.concurrency}") Integer listenerConcurrency) {
+    @Autowired
+    public KafkaConfig(AvroDeserializer<ChsDelta> deserializer, AvroSerializer serializer,
+                        @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers,
+                        @Value("${spring.kafka.listener.concurrency}") Integer listenerConcurrency) {
         this.bootstrapServers = bootstrapServers;
         this.listenerConcurrency = listenerConcurrency;
-        this.chsDeltaDeserializer = chsDeltaDeserializer;
-        this.chsDeltaSerializer = chsDeltaSerializer;
-
+        this.deserializer = deserializer;
+        this.serializer = serializer;
     }
 
     /**
@@ -59,7 +57,7 @@ public class KafkaConfig {
     @Bean
     public ConsumerFactory<String, ChsDelta> kafkaConsumerFactory() {
         return new DefaultKafkaConsumerFactory<>(consumerConfigs(), new StringDeserializer(),
-                new ErrorHandlingDeserializer<>(chsDeltaDeserializer));
+                new ErrorHandlingDeserializer<>(deserializer));
     }
 
     /**
@@ -70,11 +68,11 @@ public class KafkaConfig {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ChsDeltaSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, AvroSerializer.class);
         props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG,
-                RetryableErrorInterceptor.class.getName());
+                TopicErrorInterceptor.class.getName());
         DefaultKafkaProducerFactory<String, Object> factory = new DefaultKafkaProducerFactory<>(
-                props, new StringSerializer(), chsDeltaSerializer);
+                props, new StringSerializer(), serializer);
         return factory;
     }
 
@@ -109,7 +107,7 @@ public class KafkaConfig {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class);
         props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS,
-                ChsDeltaDeserializer.class);
+                AvroDeserializer.class);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
         props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");

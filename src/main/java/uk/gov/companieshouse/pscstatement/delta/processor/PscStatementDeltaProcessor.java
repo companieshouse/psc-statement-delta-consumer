@@ -3,10 +3,12 @@ package uk.gov.companieshouse.pscstatement.delta.processor;
 import static java.lang.String.format;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import consumer.exception.NonRetryableErrorException;
+
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.api.delta.PscStatement;
 import uk.gov.companieshouse.api.delta.PscStatementDeleteDelta;
@@ -14,7 +16,6 @@ import uk.gov.companieshouse.api.delta.PscStatementDelta;
 import uk.gov.companieshouse.api.psc.CompanyPscStatement;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.logging.Logger;
-import uk.gov.companieshouse.pscstatement.delta.exception.NonRetryableErrorException;
 import uk.gov.companieshouse.pscstatement.delta.mapper.MapperUtils;
 import uk.gov.companieshouse.pscstatement.delta.service.ApiClientService;
 import uk.gov.companieshouse.pscstatement.delta.transformer.PscStatementApiTransformer;
@@ -45,7 +46,6 @@ public class PscStatementDeltaProcessor {
      * Process PSC Statement Delta message.
      */
     public void processDelta(Message<ChsDelta> chsDelta) {
-        final MessageHeaders headers = chsDelta.getHeaders();
         final ChsDelta payload = chsDelta.getPayload();
         final String contextId = payload.getContextId();
         CompanyPscStatement companyPscStatement = new CompanyPscStatement();

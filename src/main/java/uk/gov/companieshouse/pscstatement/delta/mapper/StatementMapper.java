@@ -32,6 +32,7 @@ public interface StatementMapper {
     @Mapping(target = "linkedPscName", source = "linkedPsc.surname", ignore = true)
     @Mapping(target = "notifiedOn", source = "submittedOn", dateFormat = "yyyyMMdd")
     @Mapping(target = "notificationId", source = "linkedPsc.notificationId", ignore = true)
+    @Mapping(target = "restrictionsNoticeWithdrawalReason", source = "restrictionsNoticeReason", ignore = true)
     @Mapping(target = "statement", source = "statement")
     Statement pscStatementToStatement(PscStatement pscStatement);
 

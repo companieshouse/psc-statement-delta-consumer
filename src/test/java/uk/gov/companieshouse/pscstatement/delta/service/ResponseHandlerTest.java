@@ -16,9 +16,10 @@ import uk.gov.companieshouse.api.handler.delta.pscstatements.request.PscStatemen
 import uk.gov.companieshouse.api.handler.exception.URIValidationException;
 import uk.gov.companieshouse.api.model.ApiResponse;
 import uk.gov.companieshouse.logging.Logger;
-import uk.gov.companieshouse.pscstatement.delta.exception.NonRetryableErrorException;
-import uk.gov.companieshouse.pscstatement.delta.exception.RetryableErrorException;
+import consumer.exception.NonRetryableErrorException;
+import consumer.exception.RetryableErrorException;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 @ExtendWith(MockitoExtension.class)
 public class ResponseHandlerTest {
 
@@ -88,9 +89,8 @@ public class ResponseHandlerTest {
         doThrow(RetryableErrorException.class).when(spyHandler).handleApiResponse(logger, null,
                 null, null, pscStatementsDelete);
 
-        RetryableErrorException thrown = assertThrows(RetryableErrorException.class, ()-> {
-            spyHandler.
-                    handleApiResponse(logger, null,null,null, pscStatementsDelete);
+        assertThrows(RetryableErrorException.class, ()-> {
+                spyHandler.handleApiResponse(logger, null,null,null, pscStatementsDelete);
         });
     }
 }
