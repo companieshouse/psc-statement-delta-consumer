@@ -414,6 +414,11 @@
                     <failsOnError>true</failsOnError>
                     <failOnViolation>true</failOnViolation>
                     <configLocation>src/main/resources/checkstyle.xml</configLocation>
+                    <compilerArgs>
+                        <compilerArg>
+                            -Amapstruct.defaultComponentModel=spring
+                        </compilerArg>
+                    </compilerArgs>
                 </configuration>
                 <dependencies>
                     <dependency>
