@@ -15,7 +15,6 @@ import org.springframework.kafka.test.utils.KafkaTestUtils;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.pscstatement.delta.data.TestData;
-import uk.gov.companieshouse.pscstatement.delta.matcher.PscStatementMatcher;
 import consumer.matcher.RequestMatcher;
 
 import java.util.List;
