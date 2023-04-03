@@ -53,7 +53,7 @@ public class StatementMapperTest {
     }
 
     @Test
-    public void shouldMapPscStatementToStatement() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    public void shouldMapPscStatementToStatement() {
         when(mapperUtils.encode("3000000002")).thenReturn("I5tVa-U7URp5pDuXSyEQ8NILVWU");
         when(mapperUtils.encode("3005011944")).thenReturn("Uuiit_lN49JBa-Jp3bqNLsa3UG8");
         Statement statement = statementMapper.pscStatementToStatement(pscStatement);
