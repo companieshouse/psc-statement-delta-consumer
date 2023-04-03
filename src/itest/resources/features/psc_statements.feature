@@ -4,8 +4,22 @@ Feature: Psc Statements
     When the consumer receives a message
     Then a PUT request is sent to the psc statement data api with the encoded data
 
-  Scenario: send DELETE request to the data api
+  Scenario: Process invalid avro message
     Given the application is running
-    When the consumer receives a delete payload
-    Then a DELETE request is sent to the psc statement data api with the encoded Id
+    When an invalid avro message is sent
+    Then the message should be moved to topic psc-statement-delta-error
 
+  Scenario: Process message with invalid data
+    Given the application is running
+    When a message with invalid data is sent
+    Then the message should be moved to topic psc-statement-delta-error
+
+  Scenario: Process message when the data api returns 400
+    Given the application is running
+    When the consumer receives a message but the data api returns a 400
+    Then the message should be moved to topic psc-statement-delta-error
+
+  Scenario: Process message when the data api returns 503
+    Given the application is running
+    When the consumer receives a message but the data api returns a 503
+    Then the message should retry 3 times and then error

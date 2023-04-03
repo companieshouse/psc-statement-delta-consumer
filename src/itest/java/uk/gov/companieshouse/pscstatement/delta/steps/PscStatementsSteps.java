@@ -5,18 +5,23 @@ import io.cucumber.java.After;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.test.utils.KafkaTestUtils;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.pscstatement.delta.data.TestData;
 import uk.gov.companieshouse.pscstatement.delta.matcher.PscStatementMatcher;
+import consumer.matcher.RequestMatcher;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.StreamSupport;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,7 +60,7 @@ public class PscStatementsSteps {
     @When("the consumer receives a message")
     public void the_consumer_receives_a_message()  throws Exception {
         configureWiremock();
-        stubPutStatement(200, "08694860", "I5tVa-U7URp5pDuXSyEQ8NILVWU");
+        stubPutStatement(200);
         this.output = TestData.getStatementOutput();
         ChsDelta delta = new ChsDelta(TestData.getStatementDelta(), 1, "123456789", false);
         kafkaTemplate.send(mainTopic, delta);
@@ -65,15 +70,59 @@ public class PscStatementsSteps {
     @When("the consumer receives a delete payload")
     public void theConsumerReceivesDelete() throws Exception {
         configureWiremock();
-        stubDeleteStatement(200, "09950914", "ENU4UQK4mpX39qvyVkYEGZYt4ME");
+        stubDeleteStatement(200);
         ChsDelta delta = new ChsDelta(TestData.getDeleteData(), 1, "1", true);
         kafkaTemplate.send(mainTopic, delta);
         countDown();
     }
 
+    @When("the consumer receives an invalid delete payload")
+    public void theConsumerReceivesInvalidDelete() throws Exception {
+        configureWiremock();
+        ChsDelta delta = new ChsDelta("invalid", 1, "1", true);
+        kafkaTemplate.send(mainTopic, delta);
+
+        countDown();
+    }
+
+    @When("^the consumer receives a delete message but the data api returns a (\\d*)$")
+    public void theConsumerReceivesDeleteMessageButDataApiReturns(int responseCode) throws Exception{
+        configureWiremock();
+        stubDeleteStatement(responseCode);
+        ChsDelta delta = new ChsDelta(TestData.getDeleteData(), 1, "1", true);
+        kafkaTemplate.send(mainTopic, delta);
+
+        countDown();
+    }
+
+    @When("^the consumer receives a message but the data api returns a (\\d*)$")
+    public void theConsumerReceivesMessageButDataApiReturns(int responseCode) throws Exception{
+        configureWiremock();
+        stubPutStatement(responseCode);
+        ChsDelta delta = new ChsDelta(TestData.getStatementDelta(), 1, "1", false);
+        kafkaTemplate.send(mainTopic, delta);
+
+        countDown();
+    }
+
+    @When("an invalid avro message is sent")
+    public void invalidAvroMessageIsSent() throws Exception {
+        kafkaTemplate.send(mainTopic, "InvalidData");
+
+        countDown();
+    }
+
+    @When("a message with invalid data is sent")
+    public void messageWithInvalidDataIsSent() throws Exception {
+        ChsDelta delta = new ChsDelta("InvalidData", 1, "1", false);
+        kafkaTemplate.send(mainTopic, delta);
+
+        countDown();
+    }
+
     @Then("a PUT request is sent to the psc statement data api with the encoded data")
     public void put_sent_to_data_api() {
-        verify(1, requestMadeFor(new PscStatementMatcher(logger, output,
+        verify(1, requestMadeFor(new RequestMatcher(logger, output,
                 "/company/08694860/persons-with-significant-control-statements/I5tVa-U7URp5pDuXSyEQ8NILVWU/internal",
                 List.of("statement.etag"))));
     }
@@ -84,15 +133,35 @@ public class PscStatementsSteps {
                 "/company/09950914/persons-with-significant-control-statements/ENU4UQK4mpX39qvyVkYEGZYt4ME/internal")));
     }
 
-    private void stubPutStatement(int responseCode, String companyNumber, String statementId) {
-        stubFor(put(urlEqualTo(String.format(
-                "/company/%s/persons-with-significant-control-statements/%s/internal", companyNumber, statementId)))
+    @Then("^the message should be moved to topic (.*)$")
+    public void theMessageShouldBeMovedToTopic(String topic) {
+        ConsumerRecord<String, Object> singleRecord = KafkaTestUtils.getSingleRecord(kafkaConsumer, topic);
+
+        assertThat(singleRecord.value()).isNotNull();
+    }
+
+    @Then("^the message should retry (\\d*) times and then error$")
+    public void theMessageShouldRetryAndError(int retries) {
+        ConsumerRecords<String, Object> records = KafkaTestUtils.getRecords(kafkaConsumer);
+        Iterable<ConsumerRecord<String, Object>> retryRecords =  records.records("psc-statement-delta-retry");
+        Iterable<ConsumerRecord<String, Object>> errorRecords =  records.records("psc-statement-delta-error");
+
+        int actualRetries = (int) StreamSupport.stream(retryRecords.spliterator(), false).count();
+        int errors = (int) StreamSupport.stream(errorRecords.spliterator(), false).count();
+
+        assertThat(actualRetries).isEqualTo(retries);
+        assertThat(errors).isEqualTo(1);
+    }
+
+    private void stubPutStatement(int responseCode) {
+        stubFor(put(urlEqualTo(
+                "/company/08694860/persons-with-significant-control-statements/I5tVa-U7URp5pDuXSyEQ8NILVWU/internal"))
                 .willReturn(aResponse().withStatus(responseCode)));
     }
 
-    private void stubDeleteStatement(int responseCode, String companyNumber, String statementId) {
-        stubFor(delete(urlEqualTo(String.format(
-                "/company/%s/persons-with-significant-control-statements/%s/internal", companyNumber, statementId)))
+    private void stubDeleteStatement(int responseCode) {
+        stubFor(delete(urlEqualTo(
+                "/company/09950914/persons-with-significant-control-statements/ENU4UQK4mpX39qvyVkYEGZYt4ME/internal"))
                 .willReturn(aResponse().withStatus(responseCode)));
     }
 

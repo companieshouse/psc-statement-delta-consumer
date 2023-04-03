@@ -23,6 +23,7 @@ public abstract class StatementMapper {
     @Autowired
     protected MapperUtils mapperUtils;
 
+
     @Mapping(target = "ceasedOn", source = "ceasedOn", dateFormat = "yyyyMMdd")
     @Mapping(target = "kind", source = "statement", ignore = true)
     @Mapping(target = "etag", source = "statement", ignore = true)

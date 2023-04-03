@@ -103,7 +103,8 @@ public class KafkaTestContainerConfig {
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
         props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
         KafkaConsumer<String, Object> consumer = new KafkaConsumer<>(props);
-        consumer.subscribe(List.of("psc-statement-delta"));
+        consumer.subscribe(List.of("psc-statement-delta-invalid",
+                "psc-statement-delta-error", "psc-statement-delta-retry"));
 
         return consumer;
     }

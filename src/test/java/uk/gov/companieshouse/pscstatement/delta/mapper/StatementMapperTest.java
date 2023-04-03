@@ -1,6 +1,7 @@
 package uk.gov.companieshouse.pscstatement.delta.mapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
@@ -10,6 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.FileCopyUtils;
@@ -23,7 +26,7 @@ import uk.gov.companieshouse.api.psc.StatementLinksType;
 import uk.gov.companieshouse.api.psc.Statement.KindEnum;
 import uk.gov.companieshouse.api.psc.Statement.StatementEnum;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 @ContextConfiguration(classes = { StatementMapperImpl.class})
 public class StatementMapperTest {
     
@@ -31,6 +34,9 @@ public class StatementMapperTest {
     private PscStatementDelta deltaObject;
     private PscStatement pscStatement;
 
+
+    @MockBean
+    private MapperUtils mapperUtils;
     @Autowired
     StatementMapper statementMapper;
 
@@ -43,16 +49,19 @@ public class StatementMapperTest {
 
         deltaObject = mapper.readValue(input, PscStatementDelta.class);
         pscStatement = deltaObject.getPscStatements().get(0);
+
     }
 
     @Test
     public void shouldMapPscStatementToStatement() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        when(mapperUtils.encode("3000000002")).thenReturn("I5tVa-U7URp5pDuXSyEQ8NILVWU");
+        when(mapperUtils.encode("3005011944")).thenReturn("Uuiit_lN49JBa-Jp3bqNLsa3UG8");
         Statement statement = statementMapper.pscStatementToStatement(pscStatement);
         statement.setEtag(null);
         Statement expectedResult = new Statement();
 
         StatementLinksType links = new StatementLinksType();
-        links.setSelf("/company/08694860/persons-with-significant-control-statements/bPLPNQOiML19UP_m7WEo5sO4jS0");
+        links.setSelf("/company/08694860/persons-with-significant-control-statements/I5tVa-U7URp5pDuXSyEQ8NILVWU");
         links.setPersonWithSignificantControl("/company/08694860/persons-with-significant-control/individual/Uuiit_lN49JBa-Jp3bqNLsa3UG8");
 
         expectedResult.setCeasedOn(LocalDate.of(2023, 1, 27));
