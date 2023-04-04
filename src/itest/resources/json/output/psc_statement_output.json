@@ -1,0 +1,26 @@
+{
+  "psc_statement_id":"I5tVa-U7URp5pDuXSyEQ8NILVWU",
+  "delta_at":"20230723093435661593",
+  "company_number":"08694860",
+  "statement":{
+    "kind":"persons-with-significant-control-statement",
+    "notified_on":[
+      2016,
+      3,
+      14
+    ],
+    "ceased_on":[
+      2023,
+      1,
+      27
+    ],
+    "restrictions_notice_withdrawal_reason":"restrictions-notice-withdrawn-by-company",
+    "statement":"psc-has-failed-to-confirm-changed-details",
+    "linked_psc_name":"Mr Faxrivulet Congresspersonliquor",
+    "links":{
+      "self":"/company/08694860/persons-with-significant-control-statements/I5tVa-U7URp5pDuXSyEQ8NILVWU",
+      "person_with_significant_control":"/company/08694860/persons-with-significant-control/individual/6wwbuoloYi0RrqyiVJ7eNDgDU98"
+    },
+    "notification_id":"6wwbuoloYi0RrqyiVJ7eNDgDU98"
+  }
+}

@@ -1,15 +1,11 @@
 package uk.gov.companieshouse.pscstatement.delta.mapper;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.commons.lang.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.companieshouse.GenerateEtagUtil;
 import uk.gov.companieshouse.api.delta.LinkedPsc;
 import uk.gov.companieshouse.api.delta.PscStatement;
@@ -17,13 +13,16 @@ import uk.gov.companieshouse.api.psc.Statement;
 import uk.gov.companieshouse.api.psc.Statement.KindEnum;
 import uk.gov.companieshouse.api.psc.StatementLinksType;
 
-@Mapper(componentModel = "spring")
-public interface StatementMapper {
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-    MapperUtils mapperUtils = new MapperUtils();
-    String SET_KIND = "setKind";
-    String SET_STATEMENT = "setStatement";
-    String SET_DESCRIPTION = "setDescription";
+@Mapper(componentModel = "spring")
+public abstract class StatementMapper {
+
+    @Autowired
+    protected MapperUtils mapperUtils;
+
 
     @Mapping(target = "ceasedOn", source = "ceasedOn", dateFormat = "yyyyMMdd")
     @Mapping(target = "kind", source = "statement", ignore = true)
@@ -33,17 +32,17 @@ public interface StatementMapper {
     @Mapping(target = "notifiedOn", source = "submittedOn", dateFormat = "yyyyMMdd")
     @Mapping(target = "notificationId", source = "linkedPsc.notificationId", ignore = true)
     @Mapping(target = "statement", source = "statement")
-    Statement pscStatementToStatement(PscStatement pscStatement);
+    public abstract Statement pscStatementToStatement(PscStatement pscStatement);
 
     @AfterMapping
-    default void mapEtag(@MappingTarget Statement target) {
+    public void mapEtag(@MappingTarget Statement target) {
         target.setEtag(GenerateEtagUtil.generateEtag());
     }
 
     /** Manually map restrictions notice withdrawal reasons. */
 
     @AfterMapping
-    default void mapRestrictionsNoticeWithdrawalReason(@MappingTarget Statement target, PscStatement source) {
+    public void mapRestrictionsNoticeWithdrawalReason(@MappingTarget Statement target, PscStatement source) {
         if (!StringUtils.isBlank(source.getRestrictionsNoticeReason())) {
             Map<String, String> restrictionsNoticeWithdrawalReasons = Map.ofEntries(
                     Map.entry("1", "restrictions-notice-withdrawn-by-company"),
@@ -61,7 +60,7 @@ public interface StatementMapper {
     /** Manually map linkedPsc. */
 
     @AfterMapping 
-    default void mapLinks(@MappingTarget Statement target, PscStatement source) {
+    public void mapLinks(@MappingTarget Statement target, PscStatement source) {
         String encodedId = mapperUtils.encode(source.getPscStatementId());
         StatementLinksType links = new StatementLinksType();
         links.setSelf(String
@@ -84,7 +83,7 @@ public interface StatementMapper {
     /** Manually map name and id. */
 
     @AfterMapping 
-    default void mapLinkedPscNameAndId(@MappingTarget Statement target, PscStatement source) {
+    public void mapLinkedPscNameAndId(@MappingTarget Statement target, PscStatement source) {
         LinkedPsc linkedPsc = source.getLinkedPsc();
         if (linkedPsc != null) {
             String fullName = Stream
@@ -100,7 +99,7 @@ public interface StatementMapper {
     }
 
     @AfterMapping 
-    default void mapEnums(@MappingTarget Statement target, PscStatement source) {
+    public void mapEnums(@MappingTarget Statement target, PscStatement source) {
         target.setKind(KindEnum.valueOf("PERSONS_WITH_SIGNIFICANT_CONTROL_STATEMENT"));  
     }
 
