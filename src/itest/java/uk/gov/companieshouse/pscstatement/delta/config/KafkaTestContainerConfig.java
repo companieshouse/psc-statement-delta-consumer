@@ -18,9 +18,11 @@ import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
+
+import consumer.deserialization.AvroDeserializer;
+import consumer.exception.TopicErrorInterceptor;
+import consumer.serialization.AvroSerializer;
 import uk.gov.companieshouse.delta.ChsDelta;
-import uk.gov.companieshouse.pscstatement.delta.serialization.ChsDeltaDeserializer;
-import uk.gov.companieshouse.pscstatement.delta.serialization.ChsDeltaSerializer;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,13 +30,13 @@ import java.util.Map;
 
 @TestConfiguration
 public class KafkaTestContainerConfig {
-    private final ChsDeltaSerializer chsDeltaSerializer;
-    private final ChsDeltaDeserializer chsDeltaDeserializer;
+    private final AvroDeserializer<ChsDelta> deserializer;
+    private final AvroSerializer serializer;
 
     @Autowired
-    public KafkaTestContainerConfig(ChsDeltaSerializer chsDeltaSerializer, ChsDeltaDeserializer chsDeltaDeserializer) {
-        this.chsDeltaSerializer = chsDeltaSerializer;
-        this.chsDeltaDeserializer = chsDeltaDeserializer;
+    public KafkaTestContainerConfig(AvroSerializer serializer, AvroDeserializer<ChsDelta> deserializer) {
+        this.serializer = serializer;
+        this.deserializer = deserializer;
     }
 
     @Bean
@@ -57,7 +59,7 @@ public class KafkaTestContainerConfig {
     public ConsumerFactory<String, ChsDelta> kafkaConsumerFactory() {
         return new DefaultKafkaConsumerFactory<>(consumerConfigs(kafkaContainer()),
                 new StringDeserializer(),
-                new ErrorHandlingDeserializer<>(chsDeltaDeserializer));
+                new ErrorHandlingDeserializer<>(deserializer));
     }
     @Bean
     public Map<String, Object> consumerConfigs(KafkaContainer kafkaContainer) {
@@ -66,7 +68,7 @@ public class KafkaTestContainerConfig {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class);
-        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, ChsDeltaDeserializer.class);
+        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, AvroDeserializer.class);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
         props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
@@ -78,9 +80,10 @@ public class KafkaTestContainerConfig {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaContainer.getBootstrapServers());
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ChsDeltaSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, AvroDeserializer.class);
+        props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, TopicErrorInterceptor.class.getName());
         DefaultKafkaProducerFactory<String, Object> factory = new DefaultKafkaProducerFactory<>(
-                props, new StringSerializer(), chsDeltaSerializer);
+                props, new StringSerializer(), serializer);
 
         return factory;
     }
