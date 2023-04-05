@@ -1,6 +1,7 @@
 package uk.gov.companieshouse.pscstatement.delta.consumer;
 
-import java.time.Instant;
+import consumer.exception.NonRetryableErrorException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
@@ -12,21 +13,16 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.delta.ChsDelta;
-import uk.gov.companieshouse.logging.Logger;
-import uk.gov.companieshouse.pscstatement.delta.exception.NonRetryableErrorException;
 import uk.gov.companieshouse.pscstatement.delta.processor.PscStatementDeltaProcessor;
 
 
 @Component
 public class PscStatementDeltaConsumer {
-    private final Logger logger;
     private final PscStatementDeltaProcessor deltaProcessor;
 
     @Autowired
-    public PscStatementDeltaConsumer(PscStatementDeltaProcessor deltaProcessor,
-            Logger logger) {
+    public PscStatementDeltaConsumer(PscStatementDeltaProcessor deltaProcessor) {
         this.deltaProcessor = deltaProcessor;
-        this.logger = logger;
     }
 
     /**
@@ -47,7 +43,6 @@ public class PscStatementDeltaConsumer {
                                     @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) String partition,
                                     @Header(KafkaHeaders.OFFSET) String offset) {
-        Instant startTime = Instant.now();
         ChsDelta chsDelta = message.getPayload();
         if (chsDelta.getIsDelete()) {
             deltaProcessor.processDeleteDelta(message);

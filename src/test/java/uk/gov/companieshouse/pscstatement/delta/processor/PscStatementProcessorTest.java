@@ -15,7 +15,7 @@ import uk.gov.companieshouse.api.delta.PscStatement;
 import uk.gov.companieshouse.api.psc.CompanyPscStatement;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.logging.Logger;
-import uk.gov.companieshouse.pscstatement.delta.exception.NonRetryableErrorException;
+import consumer.exception.NonRetryableErrorException;
 import uk.gov.companieshouse.pscstatement.delta.mapper.MapperUtils;
 import uk.gov.companieshouse.pscstatement.delta.service.ApiClientService;
 import uk.gov.companieshouse.pscstatement.delta.transformer.PscStatementApiTransformer;

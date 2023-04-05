@@ -1,5 +1,8 @@
 package uk.gov.companieshouse.pscstatement.delta.service;
 
+import consumer.exception.NonRetryableErrorException;
+import consumer.exception.RetryableErrorException;
+
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.stereotype.Service;
@@ -8,8 +11,6 @@ import uk.gov.companieshouse.api.handler.Executor;
 import uk.gov.companieshouse.api.handler.exception.URIValidationException;
 import uk.gov.companieshouse.api.model.ApiResponse;
 import uk.gov.companieshouse.logging.Logger;
-import uk.gov.companieshouse.pscstatement.delta.exception.NonRetryableErrorException;
-import uk.gov.companieshouse.pscstatement.delta.exception.RetryableErrorException;
 
 @SuppressWarnings("unchecked")
 @Service

@@ -15,7 +15,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.companieshouse.api.delta.PscStatement;
 import uk.gov.companieshouse.api.psc.CompanyPscStatement;
 import uk.gov.companieshouse.api.psc.Statement;
-import uk.gov.companieshouse.pscstatement.delta.exception.NonRetryableErrorException;
+import consumer.exception.NonRetryableErrorException;
 import uk.gov.companieshouse.pscstatement.delta.mapper.MapperUtils;
 import uk.gov.companieshouse.pscstatement.delta.mapper.StatementMapper;
 
