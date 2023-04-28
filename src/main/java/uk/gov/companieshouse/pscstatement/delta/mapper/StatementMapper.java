@@ -69,10 +69,13 @@ public abstract class StatementMapper {
                 encodedId)); 
 
         if (source.getLinkedPsc() != null) {
+            String encodedNotificationId = mapperUtils
+                    .encode(source.getLinkedPsc().getNotificationId());
             links.setPersonWithSignificantControl(String
-                    .format("/company/%s/persons-with-significant-control/%s",
+                    .format("/company/%s/persons-with-significant-control/%s/%s",
                     source.getCompanyNumber(), 
-                    source.getLinkedPsc().getPscKind()));
+                    source.getLinkedPsc().getPscKind(),
+                    encodedNotificationId));
         }
         target.setLinks(links);
     }

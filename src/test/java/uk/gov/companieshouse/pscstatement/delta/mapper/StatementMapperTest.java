@@ -62,7 +62,7 @@ public class StatementMapperTest {
 
         StatementLinksType links = new StatementLinksType();
         links.setSelf("/company/08694860/persons-with-significant-control-statements/I5tVa-U7URp5pDuXSyEQ8NILVWU");
-        links.setPersonWithSignificantControl("/company/08694860/persons-with-significant-control/individual");
+        links.setPersonWithSignificantControl("/company/08694860/persons-with-significant-control/individual/Uuiit_lN49JBa-Jp3bqNLsa3UG8");
 
         expectedResult.setCeasedOn(LocalDate.of(2023, 1, 27));
         expectedResult.setNotifiedOn(LocalDate.of(2016, 3, 14));
