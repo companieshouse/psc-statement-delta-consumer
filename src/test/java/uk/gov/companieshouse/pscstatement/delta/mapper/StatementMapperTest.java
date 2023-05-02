@@ -65,12 +65,10 @@ public class StatementMapperTest {
         links.setPersonWithSignificantControl("/company/08694860/persons-with-significant-control/individual/Uuiit_lN49JBa-Jp3bqNLsa3UG8");
 
         expectedResult.setCeasedOn(LocalDate.of(2023, 1, 27));
-        expectedResult.setNotificationId("3005011944");
         expectedResult.setNotifiedOn(LocalDate.of(2016, 3, 14));
         expectedResult.setKind(KindEnum.PERSONS_WITH_SIGNIFICANT_CONTROL_STATEMENT);
         expectedResult.setStatement(StatementEnum.PSC_HAS_FAILED_TO_CONFIRM_CHANGED_DETAILS);
         expectedResult.setLinkedPscName("Mr Faxrivulet Congresspersonliquor");
-        expectedResult.setNotificationId("Uuiit_lN49JBa-Jp3bqNLsa3UG8");
         expectedResult.setLinks(links);
         expectedResult.setRestrictionsNoticeWithdrawalReason("restrictions-notice-withdrawn-by-company");
 

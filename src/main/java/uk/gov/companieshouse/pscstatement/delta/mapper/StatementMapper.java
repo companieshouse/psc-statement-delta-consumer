@@ -30,7 +30,6 @@ public abstract class StatementMapper {
     @Mapping(target = "links", source = "companyNumber", ignore = true)
     @Mapping(target = "linkedPscName", source = "linkedPsc.surname", ignore = true)
     @Mapping(target = "notifiedOn", source = "submittedOn", dateFormat = "yyyyMMdd")
-    @Mapping(target = "notificationId", source = "linkedPsc.notificationId", ignore = true)
     @Mapping(target = "restrictionsNoticeWithdrawalReason", source = "restrictionsNoticeReason", ignore = true)
     @Mapping(target = "statement", source = "statement")
     public abstract Statement pscStatementToStatement(PscStatement pscStatement);
@@ -73,9 +72,9 @@ public abstract class StatementMapper {
             String encodedNotificationId = mapperUtils
                     .encode(source.getLinkedPsc().getNotificationId());
             links.setPersonWithSignificantControl(String
-                    .format("/company/%s/persons-with-significant-control/%s/%s", 
+                    .format("/company/%s/persons-with-significant-control/%s/%s",
                     source.getCompanyNumber(), 
-                    source.getLinkedPsc().getPscKind(), 
+                    source.getLinkedPsc().getPscKind(),
                     encodedNotificationId));
         }
         target.setLinks(links);
@@ -95,7 +94,6 @@ public abstract class StatementMapper {
                             linkedPsc.getHonours())
                     .filter(s -> s != null && !s.isEmpty()).collect(Collectors.joining(" "));
             target.setLinkedPscName(fullName);
-            target.setNotificationId(mapperUtils.encode(linkedPsc.getNotificationId()));
         }
     }
 
