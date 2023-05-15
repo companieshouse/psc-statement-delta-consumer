@@ -20,7 +20,7 @@ public class LoggingConfig {
      */
     @Bean
     public Logger logger() {
-        Logger loggerBean = LoggerFactory.getLogger("psc-delta-consumer");
+        Logger loggerBean = LoggerFactory.getLogger("psc-statement-delta-consumer");
         staticLogger = loggerBean;
         return loggerBean;
     }
