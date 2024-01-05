@@ -21,10 +21,10 @@ Feature: Psc Statements
 
   Scenario: Process message when the data api returns 400
     Given the application is running
-    When the consumer receives a failed_to_confirm message but the data api returns a 400
+    When the consumer receives a message failed_to_confirm but the data api returns a 400
     Then the message should be moved to topic psc-statement-delta-invalid
 
   Scenario: Process message when the data api returns 503
     Given the application is running
-    When the consumer receives a failed_to_confirm message but the data api returns a 503
+    When the consumer receives a message failed_to_confirm but the data api returns a 503
     Then the message should retry 3 times and then error

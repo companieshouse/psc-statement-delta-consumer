@@ -104,7 +104,7 @@ public class PscStatementsSteps {
         countDown();
     }
 
-    @When("^the consumer receives a (.*) message but the data api returns a (\\d*)$")
+    @When("^the consumer receives a message (.*) but the data api returns a (\\d*)$")
     public void theConsumerReceivesMessageButDataApiReturns(String type, int responseCode) throws Exception{
         configureWiremock();
         stubPutStatement(responseCode);
