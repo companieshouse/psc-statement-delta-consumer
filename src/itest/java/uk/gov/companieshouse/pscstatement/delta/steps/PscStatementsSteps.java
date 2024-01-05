@@ -65,12 +65,13 @@ public class PscStatementsSteps {
         assertThat(kafkaTemplate).isNotNull();
     }
 
-    @When("the consumer receives a message")
-    public void the_consumer_receives_a_message()  throws Exception {
+    @When("the consumer receives a message of {string}")
+    public void the_consumer_receives_a_message(String type)  throws Exception {
         configureWiremock();
         stubPutStatement(200);
-        this.output = TestData.getStatementOutput();
-        ChsDelta delta = new ChsDelta(TestData.getStatementDelta(), 1, "123456789", false);
+        this.output = TestData.getStatementOutput(type);
+        String input = TestData.getStatementDelta(type);
+        ChsDelta delta = new ChsDelta(input, 1, "123456789", false);
         kafkaTemplate.send(mainTopic, delta);
         countDown();
     }
@@ -103,11 +104,11 @@ public class PscStatementsSteps {
         countDown();
     }
 
-    @When("^the consumer receives a message but the data api returns a (\\d*)$")
-    public void theConsumerReceivesMessageButDataApiReturns(int responseCode) throws Exception{
+    @When("^the consumer receives a (.*) message but the data api returns a (\\d*)$")
+    public void theConsumerReceivesMessageButDataApiReturns(String type, int responseCode) throws Exception{
         configureWiremock();
         stubPutStatement(responseCode);
-        ChsDelta delta = new ChsDelta(TestData.getStatementDelta(), 1, "1", false);
+        ChsDelta delta = new ChsDelta(TestData.getStatementDelta(type), 1, "1", false);
         kafkaTemplate.send(mainTopic, delta);
 
         countDown();
