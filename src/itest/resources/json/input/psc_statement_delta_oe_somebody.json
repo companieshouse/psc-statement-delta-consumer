@@ -1,0 +1,21 @@
+{
+  "psc_statements": [
+    {
+      "company_number": "08694860",
+      "psc_statement_id": "3000000002",
+      "statement": "OE_SOME_BO_BECOME_OR_CEASED",
+      "submitted_on": "20160314",
+      "ceased_on": "20230127",
+      "linked_psc": {
+        "notification_id": "3005011944",
+        "psc_kind": "individual",
+        "title": "Mr",
+        "surname": "Congresspersonliquor",
+        "forename": "Faxrivulet"
+      },
+      "restrictions_notice_reason": "1"
+    }
+  ],
+  "CreatedTime": "14-DEC-22 11.51.44.000000",
+  "delta_at": "20230723093435661593"
+}
