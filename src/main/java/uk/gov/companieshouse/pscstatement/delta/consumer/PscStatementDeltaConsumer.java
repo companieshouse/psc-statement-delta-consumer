@@ -13,12 +13,19 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.delta.ChsDelta;
+import uk.gov.companieshouse.logging.Logger;
+import uk.gov.companieshouse.logging.LoggerFactory;
+import uk.gov.companieshouse.pscstatement.delta.logging.DataMapHolder;
 import uk.gov.companieshouse.pscstatement.delta.processor.PscStatementDeltaProcessor;
+
+
+import static uk.gov.companieshouse.pscstatement.delta.PscStatementDeltaConsumerApplication.NAMESPACE;
 
 
 @Component
 public class PscStatementDeltaConsumer {
     private final PscStatementDeltaProcessor deltaProcessor;
+    private static final Logger LOGGER = LoggerFactory.getLogger(NAMESPACE);
 
     @Autowired
     public PscStatementDeltaConsumer(PscStatementDeltaProcessor deltaProcessor) {
@@ -45,8 +52,10 @@ public class PscStatementDeltaConsumer {
                                     @Header(KafkaHeaders.OFFSET) String offset) {
         ChsDelta chsDelta = message.getPayload();
         if (chsDelta.getIsDelete()) {
+            LOGGER.info("Delete message received", DataMapHolder.getLogMap());
             deltaProcessor.processDeleteDelta(message);
         } else {
+            LOGGER.info("Resource changed message received", DataMapHolder.getLogMap());
             deltaProcessor.processDelta(message);
         }
     }
