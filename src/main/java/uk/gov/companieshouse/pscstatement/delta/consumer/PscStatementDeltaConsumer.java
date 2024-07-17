@@ -51,7 +51,7 @@ public class PscStatementDeltaConsumer {
                                     @Header(KafkaHeaders.RECEIVED_PARTITION_ID) String partition,
                                     @Header(KafkaHeaders.OFFSET) String offset) {
         ChsDelta chsDelta = message.getPayload();
-        String contextId = chsDelta.getContextId()
+        String contextId = chsDelta.getContextId();
         if (chsDelta.getIsDelete()) {
             LOGGER.infoContext(contextId,"Delete message received",
                     DataMapHolder.getLogMap());
