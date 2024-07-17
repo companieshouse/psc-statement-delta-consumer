@@ -23,6 +23,9 @@ public class DataMapHolder {
         return DATAMAP_BUILDER.get();
     }
 
+    /**
+     * fetches log map.
+     */
     public static Map<String, Object> getLogMap() {
         return DATAMAP_BUILDER.get()
                 .build()

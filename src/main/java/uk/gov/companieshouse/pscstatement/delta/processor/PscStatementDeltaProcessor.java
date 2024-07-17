@@ -16,6 +16,7 @@ import uk.gov.companieshouse.api.delta.PscStatementDelta;
 import uk.gov.companieshouse.api.psc.CompanyPscStatement;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.logging.Logger;
+import uk.gov.companieshouse.pscstatement.delta.logging.DataMapHolder;
 import uk.gov.companieshouse.pscstatement.delta.mapper.MapperUtils;
 import uk.gov.companieshouse.pscstatement.delta.service.ApiClientService;
 import uk.gov.companieshouse.pscstatement.delta.transformer.PscStatementApiTransformer;
@@ -48,9 +49,10 @@ public class PscStatementDeltaProcessor {
     public void processDelta(Message<ChsDelta> chsDelta) {
         final ChsDelta payload = chsDelta.getPayload();
         final String contextId = payload.getContextId();
+
         CompanyPscStatement companyPscStatement = new CompanyPscStatement();
-        logger.info(format("Successfully extracted Chs Delta with context_id %s",
-                payload.getContextId()));
+
+
         ObjectMapper mapper = new ObjectMapper();
         PscStatementDelta pscStatementDelta;
         try {
@@ -62,7 +64,11 @@ public class PscStatementDeltaProcessor {
             for (PscStatement pscStatement : statements) {
                 companyPscStatement = transformer.transform(pscStatement);
                 companyPscStatement.setDeltaAt(pscStatementDelta.getDeltaAt());
-                logger.info(format("CompanyPscStatement: %s", companyPscStatement)); //remove
+                final String companyNumber = companyPscStatement.getCompanyNumber();
+                DataMapHolder.get()
+                        .companyNumber(companyNumber);
+                logger.info(format("Successfully extracted Chs Delta with context_id %s",
+                        DataMapHolder.getLogMap()));
 
             }
         } catch (Exception ex) {
@@ -81,10 +87,15 @@ public class PscStatementDeltaProcessor {
         final ChsDelta payload = chsDelta.getPayload();
         final String contextId = payload.getContextId();
         PscStatementDeleteDelta pscStatementDeleteDelta;
-        logger.info(String.format("Successfully extracted Chs Delta with context_id %s", payload.getContextId()));
+
         ObjectMapper mapper = new ObjectMapper();
         try {
             pscStatementDeleteDelta = mapper.readValue(payload.getData(), PscStatementDeleteDelta.class);
+            final String companyNumber = pscStatementDeleteDelta.getCompanyNumber();
+            DataMapHolder.get()
+                    .companyNumber(companyNumber);
+            logger.info(String.format("Successfully extracted Chs Delta with context_id %s",
+                    DataMapHolder.getLogMap()));
         } catch (Exception ex) {
             throw new NonRetryableErrorException(
                     "Error when extracting psc-statement delete delta", ex);
