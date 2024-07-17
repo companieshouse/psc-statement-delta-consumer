@@ -67,9 +67,9 @@ public class PscStatementDeltaProcessor {
                 final String companyNumber = companyPscStatement.getCompanyNumber();
                 DataMapHolder.get()
                         .companyNumber(companyNumber);
-                logger.info(format("Successfully extracted Chs Delta with context_id %s",
-                        DataMapHolder.getLogMap()));
-
+                logger.infoContext(contextId,String.format("Successfully extracted Chs Delta with contextId %s",
+                                contextId),
+                                DataMapHolder.getLogMap());
             }
         } catch (Exception ex) {
             throw new NonRetryableErrorException(
@@ -94,8 +94,9 @@ public class PscStatementDeltaProcessor {
             final String companyNumber = pscStatementDeleteDelta.getCompanyNumber();
             DataMapHolder.get()
                     .companyNumber(companyNumber);
-            logger.info(String.format("Successfully extracted Chs Delta with context_id %s",
-                    DataMapHolder.getLogMap()));
+            logger.infoContext(contextId,String.format("Successfully extracted Chs Delta with contextId %s",
+                            contextId),
+                            DataMapHolder.getLogMap());
         } catch (Exception ex) {
             throw new NonRetryableErrorException(
                     "Error when extracting psc-statement delete delta", ex);
