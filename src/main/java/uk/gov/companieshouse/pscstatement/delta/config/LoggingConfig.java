@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
+import uk.gov.companieshouse.pscstatement.delta.PscStatementDeltaConsumerApplication;
 
 /**
  * Configuration class for logging.
@@ -20,7 +21,7 @@ public class LoggingConfig {
      */
     @Bean
     public Logger logger() {
-        Logger loggerBean = LoggerFactory.getLogger("psc-statement-delta-consumer");
+        Logger loggerBean = LoggerFactory.getLogger(PscStatementDeltaConsumerApplication.NAMESPACE);
         staticLogger = loggerBean;
         return loggerBean;
     }
