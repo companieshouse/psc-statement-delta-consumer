@@ -21,7 +21,7 @@ public class LoggingConfig {
      */
     @Bean
     public Logger logger() {
-        Logger loggerBean = LoggerFactory.getLogger(PscStatementDeltaConsumerApplication.NAMESPACE);
+        var loggerBean = LoggerFactory.getLogger(PscStatementDeltaConsumerApplication.NAMESPACE);
         staticLogger = loggerBean;
         return loggerBean;
     }
