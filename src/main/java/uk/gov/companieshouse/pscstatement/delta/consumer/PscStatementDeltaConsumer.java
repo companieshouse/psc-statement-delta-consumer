@@ -18,7 +18,6 @@ import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.pscstatement.delta.logging.DataMapHolder;
 import uk.gov.companieshouse.pscstatement.delta.processor.PscStatementDeltaProcessor;
 
-
 import static uk.gov.companieshouse.pscstatement.delta.PscStatementDeltaConsumerApplication.NAMESPACE;
 
 
