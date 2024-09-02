@@ -14,6 +14,10 @@ public class LoggingConfig {
 
     private static Logger staticLogger;
 
+    public static Logger getLogger() {
+        return staticLogger;
+    }
+
     /**
      * Creates a logger with specified namespace.
      *
@@ -21,12 +25,9 @@ public class LoggingConfig {
      */
     @Bean
     public Logger logger() {
-        Logger loggerBean = LoggerFactory.getLogger(PscStatementDeltaConsumerApplication.NAMESPACE);
+        Logger loggerBean = LoggerFactory.getLogger(PscStatementDeltaConsumerApplication
+                .APPLICATION_NAME_SPACE);
         staticLogger = loggerBean;
         return loggerBean;
-    }
-
-    public static Logger getLogger() {
-        return staticLogger;
     }
 }

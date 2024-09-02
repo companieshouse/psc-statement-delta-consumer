@@ -2,11 +2,9 @@ package uk.gov.companieshouse.pscstatement.delta.config;
 
 import consumer.deserialization.AvroDeserializer;
 import consumer.serialization.AvroSerializer;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.environment.EnvironmentReader;
 import uk.gov.companieshouse.environment.impl.EnvironmentReaderImpl;

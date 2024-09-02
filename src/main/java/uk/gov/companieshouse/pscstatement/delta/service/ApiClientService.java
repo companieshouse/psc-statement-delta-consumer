@@ -23,9 +23,9 @@ public class ApiClientService {
     @Value("${api.api-url}")
     private String url;
 
-    private Logger logger;
+    private final Logger logger;
 
-    private ResponseHandlerFactory responseHandlerFactory;
+    private final ResponseHandlerFactory responseHandlerFactory;
 
     @Autowired
     public ApiClientService(Logger logger, ResponseHandlerFactory responseHandlerFactory) {
@@ -54,7 +54,7 @@ public class ApiClientService {
     /**
      * Invokes put handler for psc statements.
      */
-    public ApiResponse<Void> invokePscStatementPutHandler(String context, String companyNumber, 
+    public ApiResponse<Void> invokePscStatementPutHandler(String context, String companyNumber,
             String statementId, CompanyPscStatement statement) {
         final String uri = String.format(
                 "/company/%s/persons-with-significant-control-statements/%s/internal",
@@ -66,40 +66,48 @@ public class ApiClientService {
 
         Map<String, Object> logMap = createLogMap(companyNumber, statementId, "PUT", uri);
         logger.infoContext(context, String.format("PUT %s", uri), logMap);
-        
-        ResponseHandler<PscStatementsPut> responseHandler = 
-                (ResponseHandler<PscStatementsPut>) responseHandlerFactory.createResponseHandler(putExecuteOp);
-        return responseHandler.handleApiResponse(logger, context, "putPscStatement", uri, putExecuteOp);
+
+        ResponseHandler<PscStatementsPut> responseHandler =
+                (ResponseHandler<PscStatementsPut>) responseHandlerFactory.createResponseHandler(
+                        putExecuteOp);
+        return responseHandler.handleApiResponse(logger, context, "putPscStatement", uri,
+                putExecuteOp);
     }
 
     /**
      * Invokes delete handler for psc statements.
      */
-    public ApiResponse<Void> invokePscStatementDeleteHandler(String context, String companyNumber, String statementId) {
-        final String uri = String.format("/company/%s/persons-with-significant-control-statements/%s/internal",
+    public ApiResponse<Void> invokePscStatementDeleteHandler(String context, String companyNumber,
+            String statementId) {
+        final String uri = String.format(
+                "/company/%s/persons-with-significant-control-statements/%s/internal",
                 companyNumber, statementId);
         PscStatementsDelete deleteExecuteOp = getApiClient(context)
                 .privateDeltaResourceHandler()
-                        .deletePscStatements(uri);
+                .deletePscStatements(uri);
 
-        Map<String,Object> logMap = createLogMap(companyNumber, statementId,"DELETE", uri);
+        Map<String, Object> logMap = createLogMap(companyNumber, statementId, "DELETE", uri);
         logger.infoContext(context, String.format("DELETE %s", uri), logMap);
-        ResponseHandler<PscStatementsDelete> responseHandler = 
-                (ResponseHandler<PscStatementsDelete>) responseHandlerFactory.createResponseHandler(deleteExecuteOp);
+        ResponseHandler<PscStatementsDelete> responseHandler =
+                (ResponseHandler<PscStatementsDelete>) responseHandlerFactory.createResponseHandler(
+                        deleteExecuteOp);
 
-        return responseHandler.handleApiResponse(logger,context, "deletePscStatement", uri, deleteExecuteOp);
+        return responseHandler.handleApiResponse(logger, context, "deletePscStatement", uri,
+                deleteExecuteOp);
     }
 
     // logMaps set to final
+
     /**
      * logger for request.
      */
-    public Map<String, Object> createLogMap(String companyNumber, String statementId, String method, String path) {
+    public Map<String, Object> createLogMap(String companyNumber, String statementId, String method,
+            String path) {
         final Map<String, Object> logMap = new HashMap<>();
-        logMap.put("company_number",companyNumber);
-        logMap.put("psc_statement_id",statementId);
-        logMap.put("method",method);
-        logMap.put("path",path);
+        logMap.put("company_number", companyNumber);
+        logMap.put("psc_statement_id", statementId);
+        logMap.put("method", method);
+        logMap.put("path", path);
         return logMap;
     }
 }

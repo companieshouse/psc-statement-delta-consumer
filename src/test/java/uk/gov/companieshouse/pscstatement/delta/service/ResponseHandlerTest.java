@@ -2,12 +2,16 @@ package uk.gov.companieshouse.pscstatement.delta.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpResponseException;
-import org.junit.jupiter.api.Test;
+import consumer.exception.NonRetryableErrorException;
+import consumer.exception.RetryableErrorException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -16,8 +20,6 @@ import uk.gov.companieshouse.api.handler.delta.pscstatements.request.PscStatemen
 import uk.gov.companieshouse.api.handler.exception.URIValidationException;
 import uk.gov.companieshouse.api.model.ApiResponse;
 import uk.gov.companieshouse.logging.Logger;
-import consumer.exception.NonRetryableErrorException;
-import consumer.exception.RetryableErrorException;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 @ExtendWith(MockitoExtension.class)
@@ -32,55 +34,60 @@ public class ResponseHandlerTest {
     private PscStatementsDelete pscStatementsDelete;
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         responseHandler = new ResponseHandler();
     }
 
     @Test
-    public void returnOkResponseFromDataApi() throws ApiErrorResponseException, URIValidationException {
+    public void returnOkResponseFromDataApi()
+            throws ApiErrorResponseException, URIValidationException {
         ApiResponse<Void> expectedResponse = new ApiResponse<>(200, null, null);
         when(pscStatementsDelete.execute()).thenReturn(expectedResponse);
 
         ApiResponse<Void> response = responseHandler.
-                handleApiResponse(logger,null,null,null,pscStatementsDelete);
+                handleApiResponse(logger, null, null, null, pscStatementsDelete);
         assertEquals(response, expectedResponse);
     }
 
     @Test
-    public void throwValidationErrorResponse() throws ApiErrorResponseException, URIValidationException {
+    public void throwValidationErrorResponse()
+            throws ApiErrorResponseException, URIValidationException {
         when(pscStatementsDelete.execute()).thenThrow(new URIValidationException("invalid path"));
 
-        RetryableErrorException thrown = assertThrows(RetryableErrorException.class, ()-> {
+        RetryableErrorException thrown = assertThrows(RetryableErrorException.class, () -> {
             responseHandler.
-                    handleApiResponse(logger, null,null,null, pscStatementsDelete);
+                    handleApiResponse(logger, null, null, null, pscStatementsDelete);
         });
         assertEquals("Invalid path specified", thrown.getMessage());
     }
 
     @Test
-    public void throwApiErrorResponseOn400() throws ApiErrorResponseException, URIValidationException {
+    public void throwApiErrorResponseOn400()
+            throws ApiErrorResponseException, URIValidationException {
         HttpResponseException.Builder builder = new HttpResponseException.Builder(400,
-                "BAD_REQUEST",new HttpHeaders());
+                "BAD_REQUEST", new HttpHeaders());
         when(pscStatementsDelete.execute()).thenThrow(new ApiErrorResponseException(builder));
 
-        NonRetryableErrorException thrown = assertThrows(NonRetryableErrorException.class, ()-> {
+        NonRetryableErrorException thrown = assertThrows(NonRetryableErrorException.class, () -> {
             responseHandler.
-                    handleApiResponse(logger, null,null,null, pscStatementsDelete);
+                    handleApiResponse(logger, null, null, null, pscStatementsDelete);
         });
-        assertEquals("400 BAD_REQUEST response received from psc-statements-data-api", thrown.getMessage());
+        assertEquals("400 BAD_REQUEST response received from psc-statements-data-api",
+                thrown.getMessage());
     }
 
     @Test
     public void throwErrorResponseOn404() throws ApiErrorResponseException, URIValidationException {
         HttpResponseException.Builder builder = new HttpResponseException.Builder(404,
-                "server error",new HttpHeaders());
+                "server error", new HttpHeaders());
         when(pscStatementsDelete.execute()).thenThrow(new ApiErrorResponseException(builder));
 
-        RetryableErrorException thrown = assertThrows(RetryableErrorException.class, ()-> {
+        RetryableErrorException thrown = assertThrows(RetryableErrorException.class, () -> {
             responseHandler.
-                    handleApiResponse(logger, null,null,null, pscStatementsDelete);
+                    handleApiResponse(logger, null, null, null, pscStatementsDelete);
         });
-        assertEquals("server error with 404 NOT_FOUND returned from psc-statements-data-api", thrown.getMessage());
+        assertEquals("server error with 404 NOT_FOUND returned from psc-statements-data-api",
+                thrown.getMessage());
     }
 
     @Test
@@ -89,8 +96,8 @@ public class ResponseHandlerTest {
         doThrow(RetryableErrorException.class).when(spyHandler).handleApiResponse(logger, null,
                 null, null, pscStatementsDelete);
 
-        assertThrows(RetryableErrorException.class, ()-> {
-                spyHandler.handleApiResponse(logger, null,null,null, pscStatementsDelete);
+        assertThrows(RetryableErrorException.class, () -> {
+            spyHandler.handleApiResponse(logger, null, null, null, pscStatementsDelete);
         });
     }
 }
