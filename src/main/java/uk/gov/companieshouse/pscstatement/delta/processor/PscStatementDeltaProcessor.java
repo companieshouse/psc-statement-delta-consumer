@@ -3,9 +3,7 @@ package uk.gov.companieshouse.pscstatement.delta.processor;
 import static java.lang.String.format;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import consumer.exception.NonRetryableErrorException;
-
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
@@ -27,7 +25,7 @@ public class PscStatementDeltaProcessor {
     private final PscStatementApiTransformer transformer;
     private final Logger logger;
 
-    private ApiClientService apiClientService;
+    private final ApiClientService apiClientService;
 
     @Autowired
     private MapperUtils mapperUtils;
@@ -37,7 +35,7 @@ public class PscStatementDeltaProcessor {
      */
     @Autowired
     public PscStatementDeltaProcessor(Logger logger, ApiClientService apiClientService,
-                                      PscStatementApiTransformer transformer) {
+            PscStatementApiTransformer transformer) {
         this.logger = logger;
         this.apiClientService = apiClientService;
         this.transformer = transformer;
@@ -45,13 +43,13 @@ public class PscStatementDeltaProcessor {
 
     /**
      * Process PSC Statement Delta message.
+     * @throws NonRetryableErrorException Throws when transformation is non retryable
      */
     public void processDelta(Message<ChsDelta> chsDelta) {
         final ChsDelta payload = chsDelta.getPayload();
         final String contextId = payload.getContextId();
 
         CompanyPscStatement companyPscStatement = new CompanyPscStatement();
-
 
         ObjectMapper mapper = new ObjectMapper();
         PscStatementDelta pscStatementDelta;
@@ -67,21 +65,24 @@ public class PscStatementDeltaProcessor {
                 final String companyNumber = companyPscStatement.getCompanyNumber();
                 DataMapHolder.get()
                         .companyNumber(companyNumber);
-                logger.infoContext(contextId,String.format("Successfully extracted Chs Delta with contextId %s",
+                logger.infoContext(contextId,
+                        String.format("Successfully extracted Chs Delta with contextId %s",
                                 contextId),
-                                DataMapHolder.getLogMap());
+                        DataMapHolder.getLogMap());
             }
         } catch (Exception ex) {
             throw new NonRetryableErrorException(
                     "Error when extracting psc-statement delta", ex);
         }
 
-        apiClientService.invokePscStatementPutHandler(contextId, companyPscStatement.getCompanyNumber(),
+        apiClientService.invokePscStatementPutHandler(contextId,
+                companyPscStatement.getCompanyNumber(),
                 companyPscStatement.getPscStatementId(), companyPscStatement);
     }
 
     /**
      * Process PSC Statement delete Delta message.
+     * @throws NonRetryableErrorException Throws when transformation is non retryable
      */
     public void processDeleteDelta(Message<ChsDelta> chsDelta) {
         final ChsDelta payload = chsDelta.getPayload();
@@ -90,19 +91,22 @@ public class PscStatementDeltaProcessor {
 
         ObjectMapper mapper = new ObjectMapper();
         try {
-            pscStatementDeleteDelta = mapper.readValue(payload.getData(), PscStatementDeleteDelta.class);
+            pscStatementDeleteDelta = mapper.readValue(payload.getData(),
+                    PscStatementDeleteDelta.class);
             final String companyNumber = pscStatementDeleteDelta.getCompanyNumber();
             DataMapHolder.get()
                     .companyNumber(companyNumber);
-            logger.infoContext(contextId,String.format("Successfully extracted Chs Delta with contextId %s",
+            logger.infoContext(contextId,
+                    String.format("Successfully extracted Chs Delta with contextId %s",
                             contextId),
-                            DataMapHolder.getLogMap());
+                    DataMapHolder.getLogMap());
         } catch (Exception ex) {
             throw new NonRetryableErrorException(
                     "Error when extracting psc-statement delete delta", ex);
         }
         final String statementId = mapperUtils.encode(pscStatementDeleteDelta.getPscStatementId());
-        apiClientService.invokePscStatementDeleteHandler(contextId, pscStatementDeleteDelta.getCompanyNumber(),
+        apiClientService.invokePscStatementDeleteHandler(contextId,
+                pscStatementDeleteDelta.getCompanyNumber(),
                 statementId);
     }
 }

@@ -1,5 +1,9 @@
 package uk.gov.companieshouse.pscstatement.delta.utils;
 
+import static org.springframework.kafka.support.KafkaHeaders.EXCEPTION_CAUSE_FQCN;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.internals.RecordHeader;
 import org.apache.kafka.common.header.internals.RecordHeaders;
@@ -9,12 +13,8 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.FileCopyUtils;
 import uk.gov.companieshouse.delta.ChsDelta;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-
-import static org.springframework.kafka.support.KafkaHeaders.EXCEPTION_CAUSE_FQCN;
-
 public class TestHelper {
+
     public ChsDelta createChsDelta(boolean isDelete) throws IOException {
         String resource;
         if (isDelete) {
@@ -55,7 +55,8 @@ public class TestHelper {
                 .setIsDelete(isDelete)
                 .build();
     }
-    private Message<ChsDelta> buildMessage (String data, boolean isDelete) {
+
+    private Message<ChsDelta> buildMessage(String data, boolean isDelete) {
         return MessageBuilder
                 .withPayload(buildDelta(data, isDelete))
                 .setHeader(KafkaHeaders.RECEIVED_TOPIC, "test")
@@ -63,11 +64,12 @@ public class TestHelper {
                 .build();
     }
 
-    public ProducerRecord<String,Object> buildRecord(String topic, String header) {
+    public ProducerRecord<String, Object> buildRecord(String topic, String header) {
         Object obj = new Object();
         RecordHeaders headers = new RecordHeaders();
         headers.add(new RecordHeader(EXCEPTION_CAUSE_FQCN, header.getBytes()));
-        ProducerRecord<String,Object> record = new ProducerRecord<>(topic,1,1L, null,obj,headers);
+        ProducerRecord<String, Object> record = new ProducerRecord<>(topic, 1, 1L, null, obj,
+                headers);
         return record;
     }
 }

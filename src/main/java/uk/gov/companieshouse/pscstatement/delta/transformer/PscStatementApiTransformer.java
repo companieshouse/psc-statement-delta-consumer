@@ -1,10 +1,8 @@
 package uk.gov.companieshouse.pscstatement.delta.transformer;
 
 import consumer.exception.NonRetryableErrorException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import uk.gov.companieshouse.api.delta.PscStatement;
 import uk.gov.companieshouse.api.psc.CompanyPscStatement;
 import uk.gov.companieshouse.api.psc.Statement;
@@ -19,14 +17,19 @@ public class PscStatementApiTransformer {
 
     @Autowired
     private MapperUtils mapperUtils;
-    
-    /**constructor. */
+
+    /**
+     * constructor.
+     */
     @Autowired
     public PscStatementApiTransformer(StatementMapper mapper) {
         this.mapper = mapper;
     }
 
-    /**turns pscStatement into CompanyPscStatement. */
+    /**
+     * turns pscStatement into CompanyPscStatement.
+     * @throws NonRetryableErrorException Throws when transformation is non retryable
+     */
     public CompanyPscStatement transform(PscStatement pscStatement) {
         try {
             Statement statement = mapper.pscStatementToStatement(pscStatement);
