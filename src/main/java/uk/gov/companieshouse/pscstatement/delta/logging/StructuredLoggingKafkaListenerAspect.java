@@ -17,7 +17,7 @@ import uk.gov.companieshouse.pscstatement.delta.PscStatementDeltaConsumerApplica
 class StructuredLoggingKafkaListenerAspect {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(
-            PscStatementDeltaConsumerApplication.NAMESPACE);
+            PscStatementDeltaConsumerApplication.APPLICATION_NAME_SPACE);
 
     private static final String LOG_MESSAGE_RECEIVED = "Processing delta";
     private static final String LOG_MESSAGE_PROCESSED = "Processed delta";
@@ -35,7 +35,7 @@ class StructuredLoggingKafkaListenerAspect {
             DataMapHolder.get()
                     .topic((String) message.getHeaders().get("kafka_receivedTopic"))
                     .partition((Integer) message.getHeaders().get("kafka_receivedPartitionId"))
-                    .offset((Long)message.getHeaders().get("kafka_offset"));
+                    .offset((Long) message.getHeaders().get("kafka_offset"));
 
             LOGGER.debug(LOG_MESSAGE_RECEIVED, DataMapHolder.getLogMap());
 
@@ -56,7 +56,7 @@ class StructuredLoggingKafkaListenerAspect {
 
     private Optional<String> extractContextId(Object payload) {
         if (payload instanceof ChsDelta) {
-            return Optional.of(((ChsDelta)payload).getContextId());
+            return Optional.of(((ChsDelta) payload).getContextId());
         }
         return Optional.empty();
     }

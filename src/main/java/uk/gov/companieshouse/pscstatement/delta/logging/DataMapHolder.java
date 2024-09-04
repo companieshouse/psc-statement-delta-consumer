@@ -9,11 +9,12 @@ public class DataMapHolder {
     private static final ThreadLocal<DataMap.Builder> DATAMAP_BUILDER
             = ThreadLocal.withInitial(() -> new Builder().requestId("uninitialised"));
 
+    private DataMapHolder() {
+    }
+
     public static void initialise(String requestId) {
         DATAMAP_BUILDER.get().requestId(requestId);
     }
-
-    private DataMapHolder() {}
 
     public static void clear() {
         DATAMAP_BUILDER.remove();

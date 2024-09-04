@@ -5,17 +5,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import consumer.exception.NonRetryableErrorException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.companieshouse.api.delta.PscStatement;
 import uk.gov.companieshouse.api.psc.CompanyPscStatement;
 import uk.gov.companieshouse.api.psc.Statement;
-import consumer.exception.NonRetryableErrorException;
 import uk.gov.companieshouse.pscstatement.delta.mapper.MapperUtils;
 import uk.gov.companieshouse.pscstatement.delta.mapper.StatementMapper;
 
@@ -34,7 +33,7 @@ public class PscStatementApiTransformerTest {
         transformer = new PscStatementApiTransformer(mapper);
         pscStatement = new PscStatement();
         mapperUtils = new MapperUtils();
-        ReflectionTestUtils.setField(transformer,"mapperUtils",mapperUtils);
+        ReflectionTestUtils.setField(transformer, "mapperUtils", mapperUtils);
     }
 
     @Test
@@ -52,9 +51,10 @@ public class PscStatementApiTransformerTest {
 
     @Test
     public void transformerThrowsExceptionCompanyPscStatement() {
-        when(mapper.pscStatementToStatement(pscStatement)).thenThrow(NonRetryableErrorException.class);
+        when(mapper.pscStatementToStatement(pscStatement)).thenThrow(
+                NonRetryableErrorException.class);
 
-        assertThrows(NonRetryableErrorException.class, ()->
+        assertThrows(NonRetryableErrorException.class, () ->
                 transformer.transform(pscStatement));
     }
 }

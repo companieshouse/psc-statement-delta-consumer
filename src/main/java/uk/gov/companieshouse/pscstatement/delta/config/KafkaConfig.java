@@ -3,10 +3,8 @@ package uk.gov.companieshouse.pscstatement.delta.config;
 import consumer.deserialization.AvroDeserializer;
 import consumer.exception.TopicErrorInterceptor;
 import consumer.serialization.AvroSerializer;
-
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -25,7 +23,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
-
 import uk.gov.companieshouse.delta.ChsDelta;
 
 @Configuration
@@ -43,8 +40,8 @@ public class KafkaConfig {
      */
     @Autowired
     public KafkaConfig(AvroDeserializer<ChsDelta> deserializer, AvroSerializer serializer,
-                        @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers,
-                        @Value("${spring.kafka.listener.concurrency}") Integer listenerConcurrency) {
+            @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers,
+            @Value("${spring.kafka.listener.concurrency}") Integer listenerConcurrency) {
         this.bootstrapServers = bootstrapServers;
         this.listenerConcurrency = listenerConcurrency;
         this.deserializer = deserializer;
@@ -71,9 +68,8 @@ public class KafkaConfig {
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, AvroSerializer.class);
         props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG,
                 TopicErrorInterceptor.class.getName());
-        DefaultKafkaProducerFactory<String, Object> factory = new DefaultKafkaProducerFactory<>(
-                props, new StringSerializer(), serializer);
-        return factory;
+        return new DefaultKafkaProducerFactory<>(
+            props, new StringSerializer(), serializer);
     }
 
     /**
@@ -81,7 +77,8 @@ public class KafkaConfig {
      */
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, ChsDelta>
-            listenerContainerFactory() {
+                    listenerContainerFactory() {
+
         ConcurrentKafkaListenerContainerFactory<String, ChsDelta> factory
                 = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(kafkaConsumerFactory());

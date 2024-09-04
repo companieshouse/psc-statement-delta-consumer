@@ -1,13 +1,14 @@
 Feature: Psc Statements
+
   Scenario Outline: Can transform and send a psc statement
     Given the application is running
     When the consumer receives a message of <type>
     Then a PUT request is sent to the psc statement data api with the encoded data
     Examples:
-    | type                |
-    | "failed_to_confirm" |
-    | "oe_nobody"         |
-    | "oe_somebody"       |
+      | type                |
+      | "failed_to_confirm" |
+      | "oe_nobody"         |
+      | "oe_somebody"       |
 
   Scenario: Process invalid avro message
     Given the application is running

@@ -1,12 +1,12 @@
 package uk.gov.companieshouse.pscstatement.delta.data;
 
-import org.springframework.util.FileCopyUtils;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import org.springframework.util.FileCopyUtils;
 
 public class TestData {
+
     public static String getStatementDelta(String type) {
         String path = "src/itest/resources/json/input/psc_statement_delta_" + type + ".json";
         return readFile(path);

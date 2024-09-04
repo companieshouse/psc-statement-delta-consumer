@@ -1,27 +1,5 @@
 package uk.gov.companieshouse.pscstatement.delta.steps;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
-import io.cucumber.java.After;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.test.utils.KafkaTestUtils;
-import uk.gov.companieshouse.delta.ChsDelta;
-import uk.gov.companieshouse.logging.Logger;
-import uk.gov.companieshouse.pscstatement.delta.data.TestData;
-import consumer.matcher.RequestMatcher;
-
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.StreamSupport;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
@@ -34,16 +12,36 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
+import io.cucumber.java.After;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.StreamSupport;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.test.utils.KafkaTestUtils;
+import uk.gov.companieshouse.delta.ChsDelta;
+import uk.gov.companieshouse.logging.Logger;
+import uk.gov.companieshouse.pscstatement.delta.matcher.CustomRequestMatcher;
+import uk.gov.companieshouse.pscstatement.delta.data.TestData;
+
 public class PscStatementsSteps {
 
     private static WireMockServer wireMockServer;
+    @Autowired
+    public KafkaConsumer<String, Object> kafkaConsumer;
     @Value("${psc-statement.delta.topic}")
     private String mainTopic;
     @Value("${wiremock.server.port}")
     private String port;
-    @Autowired
-    public KafkaConsumer<String, Object> kafkaConsumer;
-
     @Autowired
     private Logger logger;
 
@@ -66,7 +64,7 @@ public class PscStatementsSteps {
     }
 
     @When("the consumer receives a message of {string}")
-    public void the_consumer_receives_a_message(String type)  throws Exception {
+    public void the_consumer_receives_a_message(String type) throws Exception {
         configureWiremock();
         stubPutStatement(200);
         this.output = TestData.getStatementOutput(type);
@@ -95,7 +93,8 @@ public class PscStatementsSteps {
     }
 
     @When("^the consumer receives a delete message but the data api returns a (\\d*)$")
-    public void theConsumerReceivesDeleteMessageButDataApiReturns(int responseCode) throws Exception{
+    public void theConsumerReceivesDeleteMessageButDataApiReturns(int responseCode)
+            throws Exception {
         configureWiremock();
         stubDeleteStatement(responseCode);
         ChsDelta delta = new ChsDelta(TestData.getDeleteData(), 1, "1", true);
@@ -105,7 +104,8 @@ public class PscStatementsSteps {
     }
 
     @When("^the consumer receives a message (.*) but the data api returns a (\\d*)$")
-    public void theConsumerReceivesMessageButDataApiReturns(String type, int responseCode) throws Exception{
+    public void theConsumerReceivesMessageButDataApiReturns(String type, int responseCode)
+            throws Exception {
         configureWiremock();
         stubPutStatement(responseCode);
         ChsDelta delta = new ChsDelta(TestData.getStatementDelta(type), 1, "1", false);
@@ -131,7 +131,7 @@ public class PscStatementsSteps {
 
     @Then("a PUT request is sent to the psc statement data api with the encoded data")
     public void put_sent_to_data_api() {
-        verify(1, requestMadeFor(new RequestMatcher(logger, output,
+        verify(1, requestMadeFor(new CustomRequestMatcher(logger, output,
                 "/company/08694860/persons-with-significant-control-statements/I5tVa-U7URp5pDuXSyEQ8NILVWU/internal",
                 List.of("statement.etag"))));
     }
@@ -144,7 +144,8 @@ public class PscStatementsSteps {
 
     @Then("^the message should be moved to topic (.*)$")
     public void theMessageShouldBeMovedToTopic(String topic) {
-        ConsumerRecord<String, Object> singleRecord = KafkaTestUtils.getSingleRecord(kafkaConsumer, topic);
+        ConsumerRecord<String, Object> singleRecord = KafkaTestUtils.getSingleRecord(kafkaConsumer,
+                topic);
 
         assertThat(singleRecord.value()).isNotNull();
     }
@@ -152,8 +153,10 @@ public class PscStatementsSteps {
     @Then("^the message should retry (\\d*) times and then error$")
     public void theMessageShouldRetryAndError(int retries) {
         ConsumerRecords<String, Object> records = KafkaTestUtils.getRecords(kafkaConsumer);
-        Iterable<ConsumerRecord<String, Object>> retryRecords =  records.records("psc-statement-delta-retry");
-        Iterable<ConsumerRecord<String, Object>> errorRecords =  records.records("psc-statement-delta-error");
+        Iterable<ConsumerRecord<String, Object>> retryRecords = records.records(
+                "psc-statement-delta-retry");
+        Iterable<ConsumerRecord<String, Object>> errorRecords = records.records(
+                "psc-statement-delta-error");
 
         int actualRetries = (int) StreamSupport.stream(retryRecords.spliterator(), false).count();
         int errors = (int) StreamSupport.stream(errorRecords.spliterator(), false).count();
@@ -175,9 +178,10 @@ public class PscStatementsSteps {
     }
 
     @After
-    public void shutdownWiremock(){
-        if (wireMockServer != null)
+    public void shutdownWiremock() {
+        if (wireMockServer != null) {
             wireMockServer.stop();
+        }
     }
 
     private void countDown() throws Exception {

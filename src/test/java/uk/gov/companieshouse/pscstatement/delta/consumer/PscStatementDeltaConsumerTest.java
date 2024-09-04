@@ -1,5 +1,6 @@
 package uk.gov.companieshouse.pscstatement.delta.consumer;
 
+import java.util.HashMap;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -11,8 +12,6 @@ import org.springframework.messaging.support.MessageBuilder;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.pscstatement.delta.processor.PscStatementDeltaProcessor;
 
-import java.util.HashMap;
-
 @ExtendWith(MockitoExtension.class)
 public class PscStatementDeltaConsumerTest {
 
@@ -20,14 +19,15 @@ public class PscStatementDeltaConsumerTest {
     PscStatementDeltaProcessor processor;
 
     @Test
-    void receiveChangedMessageTest(){
+    void receiveChangedMessageTest() {
         PscStatementDeltaConsumer consumer = new PscStatementDeltaConsumer(processor);
         ChsDelta delta = ChsDelta.newBuilder()
                 .setData("test-data")
                 .setContextId("test-context-id")
                 .setIsDelete(false)
                 .build();
-        Message<ChsDelta> message = MessageBuilder.createMessage(delta, new MessageHeaders(new HashMap<>()));
+        Message<ChsDelta> message = MessageBuilder.createMessage(delta,
+                new MessageHeaders(new HashMap<>()));
 
         consumer.receiveMainMessages(message, "topic", "partition", "offset");
 
@@ -35,14 +35,15 @@ public class PscStatementDeltaConsumerTest {
     }
 
     @Test
-    void receiveDeleteMessageTest(){
+    void receiveDeleteMessageTest() {
         PscStatementDeltaConsumer consumer = new PscStatementDeltaConsumer(processor);
         ChsDelta delta = ChsDelta.newBuilder()
                 .setData("test-data")
                 .setContextId("test-context-id")
                 .setIsDelete(true)
                 .build();
-        Message<ChsDelta> message = MessageBuilder.createMessage(delta, new MessageHeaders(new HashMap<>()));
+        Message<ChsDelta> message = MessageBuilder.createMessage(delta,
+                new MessageHeaders(new HashMap<>()));
 
         consumer.receiveMainMessages(message, "topic", "partition", "offset");
 
