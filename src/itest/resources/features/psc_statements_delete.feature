@@ -8,7 +8,7 @@ Feature: Psc Statements delete
   Scenario: send DELETE with invalid JSON
     Given the application is running
     When the consumer receives an invalid delete payload
-    Then the message should be moved to topic psc-statement-delta-invalid
+    Then the message should retry 3 times and then error
 
   Scenario: send DELETE with 400 from data api
     Given the application is running

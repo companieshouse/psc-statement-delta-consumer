@@ -19,7 +19,6 @@
         <main.class>uk.gov.companieshouse.pscstatement.delta.PscStatementDeltaConsumerApplication</main.class>
         <map-struct.version>1.5.5.FINAL</map-struct.version>
         <springfox-boot-starter.version>3.0.0</springfox-boot-starter.version>
-        <aspectjtools.version>1.9.22.1</aspectjtools.version>
 
         <!--CH Dependencies-->
         <ch-kafka.version>3.0.3</ch-kafka.version>
@@ -84,12 +83,6 @@
     </dependencyManagement>
 
     <dependencies>
-        <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjtools</artifactId>
-            <version>${aspectjtools.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
@@ -231,6 +224,11 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>1.9.22</version>
         </dependency>
     </dependencies>
 

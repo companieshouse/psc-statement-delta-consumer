@@ -8,6 +8,8 @@ import static org.mockito.Mockito.when;
 
 import consumer.exception.NonRetryableErrorException;
 import java.io.IOException;
+
+import consumer.exception.RetryableErrorException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -51,9 +53,9 @@ public class PscStatementProcessorTest {
     }
 
     @Test
-    void When_InvalidChsDeltaMessage_Expect_NonRetryableError() {
+    void When_InvalidChsDeltaMessage_Expect_RetryableError() {
         Message<ChsDelta> mockChsDeltaMessage = testHelper.createInvalidChsDeltaMessage();
-        assertThrows(NonRetryableErrorException.class,
+        assertThrows(RetryableErrorException.class,
                 () -> deltaProcessor.processDelta(mockChsDeltaMessage));
         Mockito.verify(apiClientService, times(0)).
                 invokePscStatementPutHandler(any(), any(), any(), any());
@@ -73,9 +75,9 @@ public class PscStatementProcessorTest {
     }
 
     @Test
-    void When_InvalidChsDeleteDeltaMessage_Expect_NonRetryableError() {
+    void When_InvalidChsDeleteDeltaMessage_Expect_RetryableError() {
         Message<ChsDelta> mockChsDeltaMessage = testHelper.createInvalidChsDeltaMessage();
-        assertThrows(NonRetryableErrorException.class,
+        assertThrows(RetryableErrorException.class,
                 () -> deltaProcessor.processDeleteDelta(mockChsDeltaMessage));
         Mockito.verify(apiClientService, times(0)).
                 invokePscStatementDeleteHandler(any(), any(), any());

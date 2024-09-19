@@ -18,7 +18,7 @@ Feature: Psc Statements
   Scenario: Process message with invalid data
     Given the application is running
     When a message with invalid data is sent
-    Then the message should be moved to topic psc-statement-delta-invalid
+    Then the message should retry 3 times and then error
 
   Scenario: Process message when the data api returns 400
     Given the application is running

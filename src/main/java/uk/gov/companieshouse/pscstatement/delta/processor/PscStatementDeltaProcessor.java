@@ -3,7 +3,7 @@ package uk.gov.companieshouse.pscstatement.delta.processor;
 import static java.lang.String.format;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import consumer.exception.NonRetryableErrorException;
+import consumer.exception.RetryableErrorException;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
@@ -43,7 +43,7 @@ public class PscStatementDeltaProcessor {
 
     /**
      * Process PSC Statement Delta message.
-     * @throws NonRetryableErrorException Throws when transformation is non retryable
+     * @throws RetryableErrorException when transformation is retryable
      */
     public void processDelta(Message<ChsDelta> chsDelta) {
         final ChsDelta payload = chsDelta.getPayload();
@@ -71,7 +71,7 @@ public class PscStatementDeltaProcessor {
                         DataMapHolder.getLogMap());
             }
         } catch (Exception ex) {
-            throw new NonRetryableErrorException(
+            throw new RetryableErrorException(
                     "Error when extracting psc-statement delta", ex);
         }
 
@@ -82,7 +82,7 @@ public class PscStatementDeltaProcessor {
 
     /**
      * Process PSC Statement delete Delta message.
-     * @throws NonRetryableErrorException Throws when transformation is non retryable
+     * @throws RetryableErrorException when transformation is retryable
      */
     public void processDeleteDelta(Message<ChsDelta> chsDelta) {
         final ChsDelta payload = chsDelta.getPayload();
@@ -101,7 +101,7 @@ public class PscStatementDeltaProcessor {
                             contextId),
                     DataMapHolder.getLogMap());
         } catch (Exception ex) {
-            throw new NonRetryableErrorException(
+            throw new RetryableErrorException(
                     "Error when extracting psc-statement delete delta", ex);
         }
         final String statementId = mapperUtils.encode(pscStatementDeleteDelta.getPscStatementId());
