@@ -19,7 +19,7 @@ psc-statement:
     group-id: ${PSC_STATEMENT_DELTA_GROUP_ID:psc-statement-delta-consumer}
     topic: ${PSC_STATEMENT_DELTA_TOPIC:psc-statement-delta}
     retry-attempts: ${PSC_STATEMENT_DELTA_ATTEMPTS:4}
-    backoff-delay: ${PSC_STATEMENT_DELTA_BACKOFF_DELAY:100}
+    backoff-delay: ${PSC_STATEMENT_DELTA_BACKOFF_DELAY:15000}
 
 api:
   psc-statements-data-api-key: ${PSC_STATEMENTS_DATA_API_KEY:localhost}
