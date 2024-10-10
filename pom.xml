@@ -19,6 +19,11 @@
         <main.class>uk.gov.companieshouse.pscstatement.delta.PscStatementDeltaConsumerApplication</main.class>
         <map-struct.version>1.5.5.FINAL</map-struct.version>
         <springfox-boot-starter.version>3.0.0</springfox-boot-starter.version>
+        <aspectjweaver.version>1.9.22</aspectjweaver.version>
+        <avro.version>1.12.0</avro.version>
+
+        <!--Overriding version to remove CVE-->
+        <spring-webmvc.version>6.1.13</spring-webmvc.version>
 
         <!--CH Dependencies-->
         <ch-kafka.version>3.0.3</ch-kafka.version>
@@ -118,6 +123,17 @@
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>kafka-models</artifactId>
             <version>${kafka-models.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.avro</groupId>
+                    <artifactId>avro</artifactId>
+                 </exclusion>
+             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.avro</groupId>
+            <artifactId>avro</artifactId>
+            <version>${avro.version}</version>
         </dependency>
         <dependency>
             <groupId>uk.gov.companieshouse</groupId>
@@ -228,7 +244,12 @@
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
-            <version>1.9.22</version>
+            <version>${aspectjweaver.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${spring-webmvc.version}</version>
         </dependency>
     </dependencies>
 
