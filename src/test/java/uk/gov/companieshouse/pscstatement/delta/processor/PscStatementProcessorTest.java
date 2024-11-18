@@ -80,7 +80,7 @@ public class PscStatementProcessorTest {
         assertThrows(RetryableErrorException.class,
                 () -> deltaProcessor.processDeleteDelta(mockChsDeltaMessage));
         Mockito.verify(apiClientService, times(0)).
-                invokePscStatementDeleteHandler(any(), any(), any());
+                invokePscStatementDeleteHandler(any(), any(), any(), any());
     }
 
     @Test
@@ -89,6 +89,6 @@ public class PscStatementProcessorTest {
         Message<ChsDelta> mockChsDeltaMessage = testHelper.createChsDeltaMessage(true);
         Assertions.assertDoesNotThrow(() -> deltaProcessor.processDeleteDelta(mockChsDeltaMessage));
         Mockito.verify(apiClientService, times(1)).
-                invokePscStatementDeleteHandler(any(), any(), any());
+                invokePscStatementDeleteHandler(any(), any(), any(), any());
     }
 }

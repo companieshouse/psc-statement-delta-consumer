@@ -24,7 +24,7 @@ public class ResponseHandlerFactoryTest {
 
     @Test
     void deleteExecuteOpReturnsResponseHandler() {
-        PscStatementsDelete deleteExecutor = new PscStatementsDelete(null, null, null, null);
+        PscStatementsDelete deleteExecutor = new PscStatementsDelete(null, null, null, null, null);
 
         assert (responseHandlerFactory.createResponseHandler(
                 deleteExecutor) instanceof ResponseHandler<?>);

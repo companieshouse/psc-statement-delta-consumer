@@ -26,6 +26,7 @@ public class ApiClientServiceTest {
     private final String contextId = "testContext";
     private final String companyNumber = "test12345";
     private final String statementId = "testId123456";
+    private final String deltaAt = "20240219123045999999";
 
     private final String uri = "/company/%s/persons-with-significant-control-statements/%s/internal";
     @Mock
@@ -75,8 +76,7 @@ public class ApiClientServiceTest {
                 any(PscStatementsDelete.class))).thenReturn(apiResponse);
 
         ApiResponse<Void> actualResponse = apiClientService.invokePscStatementDeleteHandler(
-                contextId,
-                companyNumber, statementId);
+                contextId, companyNumber, statementId, deltaAt);
 
         assertEquals(apiResponse, actualResponse);
         verify(deleteResponseHandler).handleApiResponse(any(), eq("testContext"),

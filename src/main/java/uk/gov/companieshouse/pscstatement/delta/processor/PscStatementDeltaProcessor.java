@@ -107,7 +107,7 @@ public class PscStatementDeltaProcessor {
         final String statementId = mapperUtils.encode(pscStatementDeleteDelta.getPscStatementId());
         apiClientService.invokePscStatementDeleteHandler(contextId,
                 pscStatementDeleteDelta.getCompanyNumber(),
-                statementId);
+                statementId, pscStatementDeleteDelta.getDeltaAt());
     }
 }
 
