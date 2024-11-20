@@ -6,7 +6,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import consumer.exception.NonRetryableErrorException;
 import java.io.IOException;
 
 import consumer.exception.RetryableErrorException;
