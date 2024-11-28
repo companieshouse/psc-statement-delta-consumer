@@ -21,9 +21,6 @@
         <aspectjweaver.version>1.9.22</aspectjweaver.version>
         <avro.version>1.12.0</avro.version>
 
-        <!--Overriding version to remove CVE-->
-        <spring-webmvc.version>6.1.13</spring-webmvc.version>
-
         <!--CH Dependencies-->
         <ch-kafka.version>3.0.3</ch-kafka.version>
         <structured-logging.version>3.0.14</structured-logging.version>
@@ -108,11 +105,6 @@
         </dependency>
         <!--Overriding Version to remove vulnerability, this can be removed once fixed in spring bom-->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>6.1.12</version>
-        </dependency>
-        <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${map-struct.version}</version>
@@ -126,6 +118,18 @@
                     <groupId>org.apache.avro</groupId>
                     <artifactId>avro</artifactId>
                  </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty.http2</groupId>
+                    <artifactId>http2-server</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty.http2</groupId>
+                    <artifactId>http2-common</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-webapp</artifactId>
+                </exclusion>
              </exclusions>
         </dependency>
         <dependency>
@@ -243,11 +247,6 @@
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
             <version>${aspectjweaver.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>${spring-webmvc.version}</version>
         </dependency>
     </dependencies>
 
