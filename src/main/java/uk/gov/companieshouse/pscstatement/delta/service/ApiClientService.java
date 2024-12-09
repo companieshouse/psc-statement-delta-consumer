@@ -28,6 +28,7 @@ public class ApiClientService {
 
     public void invokePscStatementPutRequest(String companyNumber, String statementId, CompanyPscStatement statement) {
         final String formattedUri = URI.formatted(companyNumber, statementId);
+        LOGGER.info("Sending PUT request to API", DataMapHolder.getLogMap());
         try {
             internalApiClientSupplier.get()
                     .privateDeltaResourceHandler()
@@ -38,11 +39,11 @@ public class ApiClientService {
         } catch (URIValidationException ex) {
             responseHandler.handle(ex);
         }
-        LOGGER.info("PUT request successfully sent to API", DataMapHolder.getLogMap());
     }
 
     public void invokePscStatementDeleteRequest(String companyNumber, String statementId, String deltaAt) {
         final String formattedUri = URI.formatted(companyNumber, statementId);
+        LOGGER.info("Sending DELETE request to API", DataMapHolder.getLogMap());
         try {
             internalApiClientSupplier.get()
                     .privateDeltaResourceHandler()
@@ -53,7 +54,6 @@ public class ApiClientService {
         } catch (URIValidationException ex) {
             responseHandler.handle(ex);
         }
-        LOGGER.info("DELETE request successfully sent to API", DataMapHolder.getLogMap());
     }
 }
 
