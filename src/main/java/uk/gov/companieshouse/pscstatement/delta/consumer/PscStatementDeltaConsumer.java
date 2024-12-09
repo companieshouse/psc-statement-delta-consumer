@@ -50,14 +50,12 @@ public class PscStatementDeltaConsumer {
             @Header(KafkaHeaders.RECEIVED_PARTITION) String partition,
             @Header(KafkaHeaders.OFFSET) String offset) {
         ChsDelta chsDelta = message.getPayload();
-        String contextId = chsDelta.getContextId();
+        DataMapHolder.get().requestId(chsDelta.getContextId());
         if (chsDelta.getIsDelete()) {
-            LOGGER.infoContext(contextId, "Delete message received",
-                    DataMapHolder.getLogMap());
+            LOGGER.info("Delete message received", DataMapHolder.getLogMap());
             deltaProcessor.processDeleteDelta(message);
         } else {
-            LOGGER.infoContext(contextId, "Resource changed message received",
-                    DataMapHolder.getLogMap());
+            LOGGER.info("Resource changed message received", DataMapHolder.getLogMap());
             deltaProcessor.processDelta(message);
         }
     }
