@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import consumer.exception.NonRetryableErrorException;
 import consumer.exception.RetryableErrorException;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import uk.gov.companieshouse.api.error.ApiErrorResponseException;
+import uk.gov.companieshouse.api.handler.exception.URIValidationException;
 
 @ExtendWith(MockitoExtension.class)
 class ResponseHandlerTest {
@@ -26,7 +28,8 @@ class ResponseHandlerTest {
 
     @ParameterizedTest
     @MethodSource("scenarios")
-    void shouldHandleNonRetryableScenarios(HttpStatus apiResponseStatus, Class<RuntimeException> expectedException) {
+    void shouldHandleApiErrorResponseScenarios(HttpStatus apiResponseStatus,
+            Class<RuntimeException> expectedException) {
         // given
         when(apiErrorResponseException.getStatusCode()).thenReturn(apiResponseStatus.value());
 
@@ -35,6 +38,18 @@ class ResponseHandlerTest {
 
         // then
         assertThrows(expectedException, executable);
+    }
+
+    @Test
+    void shouldHandleURIValidationException() {
+        // given
+        URIValidationException exception = new URIValidationException("Invalid URI");
+
+        // when
+        Executable executable = () -> responseHandler.handle(exception);
+
+        // then
+        assertThrows(NonRetryableErrorException.class, executable);
     }
 
     private static Stream<Arguments> scenarios() {
