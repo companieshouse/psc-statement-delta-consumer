@@ -27,7 +27,7 @@ public class ApiClientService {
     }
 
     public void invokePscStatementPutRequest(String companyNumber, String statementId, CompanyPscStatement statement) {
-        final String formattedUri = String.format(URI, companyNumber, statementId);
+        final String formattedUri = URI.formatted(companyNumber, statementId);
         try {
             internalApiClientSupplier.get()
                     .privateDeltaResourceHandler()
@@ -42,7 +42,7 @@ public class ApiClientService {
     }
 
     public void invokePscStatementDeleteRequest(String companyNumber, String statementId, String deltaAt) {
-        final String formattedUri = String.format(URI, companyNumber, statementId);
+        final String formattedUri = URI.formatted(companyNumber, statementId);
         try {
             internalApiClientSupplier.get()
                     .privateDeltaResourceHandler()
