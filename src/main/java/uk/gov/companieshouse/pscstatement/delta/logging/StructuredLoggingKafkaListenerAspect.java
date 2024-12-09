@@ -35,7 +35,7 @@ class StructuredLoggingKafkaListenerAspect {
 
     private final int maxAttempts;
 
-    StructuredLoggingKafkaListenerAspect(@Value("${psc-statment.delta.retry-attempts}") int maxAttempts) {
+    StructuredLoggingKafkaListenerAspect(@Value("${psc-statement.delta.retry-attempts}") int maxAttempts) {
         this.maxAttempts = maxAttempts;
     }
 
