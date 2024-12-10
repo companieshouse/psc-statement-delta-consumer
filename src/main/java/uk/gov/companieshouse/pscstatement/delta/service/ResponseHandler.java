@@ -1,60 +1,42 @@
 package uk.gov.companieshouse.pscstatement.delta.service;
 
+import static uk.gov.companieshouse.pscstatement.delta.PscStatementDeltaConsumerApplication.APPLICATION_NAME_SPACE;
+
 import consumer.exception.NonRetryableErrorException;
 import consumer.exception.RetryableErrorException;
-import java.util.HashMap;
-import java.util.Map;
-import org.springframework.stereotype.Service;
+import java.util.Arrays;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.api.error.ApiErrorResponseException;
-import uk.gov.companieshouse.api.handler.Executor;
 import uk.gov.companieshouse.api.handler.exception.URIValidationException;
-import uk.gov.companieshouse.api.model.ApiResponse;
 import uk.gov.companieshouse.logging.Logger;
+import uk.gov.companieshouse.logging.LoggerFactory;
+import uk.gov.companieshouse.pscstatement.delta.logging.DataMapHolder;
 
-@SuppressWarnings("unchecked")
-@Service
-public class ResponseHandler<T> {
+@Component
+public class ResponseHandler {
 
-    /**
-     * Handle response from data api.
-     *
-     * @throws NonRetryableErrorException Throws when transformation is non retryable
-     * @throws RetryableErrorException Throws when transformation is retryable
-     */
-    public ApiResponse<Void> handleApiResponse(Logger logger, String context, String operation,
-            String uri, T executor) {
-        final Map<String, Object> logMap = new HashMap<>();
-        logMap.put("operation_name", operation);
-        logMap.put("path", uri);
+    private static final Logger LOGGER = LoggerFactory.getLogger(APPLICATION_NAME_SPACE);
+    private static final String API_INFO_RESPONSE_MESSAGE = "Call to API failed, status code: %d. %s";
+    private static final String API_ERROR_RESPONSE_MESSAGE = "Call to API failed, status code: %d";
+    private static final String URI_VALIDATION_EXCEPTION_MESSAGE = "Invalid URI";
 
-        try {
-            return (ApiResponse<Void>) ((Executor<T>) executor).execute();
+    public void handle(ApiErrorResponseException ex) {
+        final int statusCode = ex.getStatusCode();
+        final HttpStatus httpStatus = HttpStatus.valueOf(statusCode);
 
-        } catch (URIValidationException ex) {
-            String msg = "Invalid path specified";
-            logger.errorContext(context, msg, ex, logMap);
-
-            throw new RetryableErrorException(msg, ex);
-        } catch (ApiErrorResponseException ex) {
-
-            if (ex.getStatusCode() == 400) {
-                // 400 bad request cannot be retried
-                String msg = "400 BAD_REQUEST response received from psc-statements-data-api";
-                logMap.put("status", ex.getStatusCode());
-                logger.errorContext(context, msg, ex, logMap);
-                throw new NonRetryableErrorException(msg, ex);
-            } else if (ex.getStatusCode() == 404) {
-                String msg = "server error with 404 NOT_FOUND returned "
-                        + "from psc-statements-data-api";
-                throw new RetryableErrorException(msg, ex);
-            }
-            String msg = "Unsuccessful response received from psc-statements-data-api";
-            logger.errorContext(context, msg, ex, logMap);
-            throw new RetryableErrorException(ex);
-        } catch (Exception ex) {
-            String msg = "error response";
-            logger.errorContext(context, msg, ex, logMap);
-            throw new RetryableErrorException(ex);
+        if (HttpStatus.CONFLICT.equals(httpStatus) || HttpStatus.BAD_REQUEST.equals(httpStatus)) {
+            LOGGER.error(API_ERROR_RESPONSE_MESSAGE.formatted(statusCode), ex, DataMapHolder.getLogMap());
+            throw new NonRetryableErrorException(API_ERROR_RESPONSE_MESSAGE.formatted(statusCode), ex);
+        } else {
+            LOGGER.info(API_INFO_RESPONSE_MESSAGE.formatted(statusCode, Arrays.toString(ex.getStackTrace())),
+                    DataMapHolder.getLogMap());
+            throw new RetryableErrorException(API_ERROR_RESPONSE_MESSAGE.formatted(statusCode), ex);
         }
+    }
+
+    public void handle(URIValidationException ex) {
+        LOGGER.error(URI_VALIDATION_EXCEPTION_MESSAGE, DataMapHolder.getLogMap());
+        throw new NonRetryableErrorException(URI_VALIDATION_EXCEPTION_MESSAGE, ex);
     }
 }

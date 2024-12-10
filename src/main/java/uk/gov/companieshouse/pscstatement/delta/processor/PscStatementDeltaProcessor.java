@@ -75,8 +75,7 @@ public class PscStatementDeltaProcessor {
                     "Error when extracting psc-statement delta", ex);
         }
 
-        apiClientService.invokePscStatementPutHandler(contextId,
-                companyPscStatement.getCompanyNumber(),
+        apiClientService.invokePscStatementPutRequest(companyPscStatement.getCompanyNumber(),
                 companyPscStatement.getPscStatementId(), companyPscStatement);
     }
 
@@ -105,8 +104,7 @@ public class PscStatementDeltaProcessor {
                     "Error when extracting psc-statement delete delta", ex);
         }
         final String statementId = mapperUtils.encode(pscStatementDeleteDelta.getPscStatementId());
-        apiClientService.invokePscStatementDeleteHandler(contextId,
-                pscStatementDeleteDelta.getCompanyNumber(),
+        apiClientService.invokePscStatementDeleteRequest(pscStatementDeleteDelta.getCompanyNumber(),
                 statementId, pscStatementDeleteDelta.getDeltaAt());
     }
 }

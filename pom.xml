@@ -59,7 +59,6 @@
         <maven-surefire-plugin.version>3.4.0</maven-surefire-plugin.version>
         <maven-failsafe-plugin.version>3.4.0</maven-failsafe-plugin.version>
         <jib-maven-plugin.version>3.4.2</jib-maven-plugin.version>
-        <maven-checkstyle-plugin.version>3.4.0</maven-checkstyle-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -400,27 +399,6 @@
                     </annotationProcessorPaths>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>${maven-checkstyle-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <violationSeverity>warning</violationSeverity>
-                    <logViolationsToConsole>true</logViolationsToConsole>
-                    <failsOnError>true</failsOnError>
-                    <failOnViolation>true</failOnViolation>
-                    <configLocation>src/main/resources/companieshouse_checks.xml</configLocation>
                 </configuration>
             </plugin>
 

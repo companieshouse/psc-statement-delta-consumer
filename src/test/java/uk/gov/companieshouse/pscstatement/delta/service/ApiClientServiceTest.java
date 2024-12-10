@@ -1,87 +1,163 @@
 package uk.gov.companieshouse.pscstatement.delta.service;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.BeforeEach;
+import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.companieshouse.api.InternalApiClient;
+import uk.gov.companieshouse.api.error.ApiErrorResponseException;
+import uk.gov.companieshouse.api.handler.delta.PrivateDeltaResourceHandler;
 import uk.gov.companieshouse.api.handler.delta.pscstatements.request.PscStatementsDelete;
 import uk.gov.companieshouse.api.handler.delta.pscstatements.request.PscStatementsPut;
+import uk.gov.companieshouse.api.handler.exception.URIValidationException;
 import uk.gov.companieshouse.api.model.ApiResponse;
 import uk.gov.companieshouse.api.psc.CompanyPscStatement;
-import uk.gov.companieshouse.logging.Logger;
-
 
 @ExtendWith(MockitoExtension.class)
-public class ApiClientServiceTest {
+class ApiClientServiceTest {
 
-    private final String contextId = "testContext";
-    private final String companyNumber = "test12345";
-    private final String statementId = "testId123456";
-    private final String deltaAt = "20240219123045999999";
+    private static final String COMPANY_NUMBER = "company_number";
+    private static final String STATEMENT_ID = "statement_id";
+    private static final String DELTA_AT = "20240219123045999999";
+    private static final String URI = "/company/%s/persons-with-significant-control-statements/%s/internal";
+    private static final ApiResponse<Void> SUCCESS_RESPONSE = new ApiResponse<>(200, null);
 
-    private final String uri = "/company/%s/persons-with-significant-control-statements/%s/internal";
-    @Mock
-    ResponseHandler<PscStatementsDelete> deleteResponseHandler;
-    @Mock
-    ResponseHandler<PscStatementsPut> putResponseHandler;
-    @Mock
-    CompanyPscStatement statement;
+    @InjectMocks
     private ApiClientService apiClientService;
-    @Mock
-    private Logger logger;
-    @Mock
-    private ResponseHandlerFactory responseHandlerFactory;
-    @Mock
-    private ApiResponse<Void> apiResponse;
 
-    @BeforeEach
-    public void setUp() {
-        apiClientService = new ApiClientService(logger, responseHandlerFactory);
-        ReflectionTestUtils.setField(apiClientService, "apiKey", "testKey");
-        ReflectionTestUtils.setField(apiClientService, "url", "http://localhost:8888");
+    @Mock
+    private ResponseHandler responseHandler;
+    @Mock
+    private Supplier<InternalApiClient> internalApiClientSupplier;
+
+    @Mock
+    private CompanyPscStatement companyPscStatement;
+    @Mock
+    private InternalApiClient internalApiClient;
+    @Mock
+    private PrivateDeltaResourceHandler privateDeltaResourceHandler;
+    @Mock
+    private PscStatementsPut pscStatementsPut;
+    @Mock
+    private PscStatementsDelete pscStatementsDelete;
+
+    @Test
+    void shouldSuccessfullySendPutRequestToApi() throws Exception {
+        // given
+        when(internalApiClientSupplier.get()).thenReturn(internalApiClient);
+        when(internalApiClient.privateDeltaResourceHandler()).thenReturn(privateDeltaResourceHandler);
+        when(privateDeltaResourceHandler.putPscStatements(anyString(), any(CompanyPscStatement.class))).thenReturn(
+                pscStatementsPut);
+        when(pscStatementsPut.execute()).thenReturn(SUCCESS_RESPONSE);
+
+        final String formattedUri = String.format(URI, COMPANY_NUMBER, STATEMENT_ID);
+
+        // when
+        apiClientService.invokePscStatementPutRequest(COMPANY_NUMBER, STATEMENT_ID, companyPscStatement);
+
+        // then
+        verify(privateDeltaResourceHandler).putPscStatements(formattedUri, companyPscStatement);
+        verifyNoMoreInteractions(responseHandler);
     }
 
     @Test
-    public void returnOkResponseWhenValidPutRequestSentToApi() {
-        String expectedUri = String.format(uri, companyNumber, statementId);
-        when(responseHandlerFactory.createResponseHandler(any())).thenReturn(putResponseHandler);
-        when(putResponseHandler.handleApiResponse(any(), anyString(),
-                anyString(), anyString(),
-                any(PscStatementsPut.class))).thenReturn(apiResponse);
+    void shouldSendPutRequestAndHandleNon200ResponseFromApi() throws Exception {
+        // given
+        when(internalApiClientSupplier.get()).thenReturn(internalApiClient);
+        when(internalApiClient.privateDeltaResourceHandler()).thenReturn(privateDeltaResourceHandler);
+        when(privateDeltaResourceHandler.putPscStatements(anyString(), any(CompanyPscStatement.class))).thenReturn(
+                pscStatementsPut);
+        when(pscStatementsPut.execute()).thenThrow(ApiErrorResponseException.class);
 
-        ApiResponse<Void> actualResponse = apiClientService.invokePscStatementPutHandler(contextId,
-                companyNumber, statementId, statement);
+        final String formattedUri = String.format(URI, COMPANY_NUMBER, STATEMENT_ID);
 
-        assertEquals(apiResponse, actualResponse);
-        verify(putResponseHandler).handleApiResponse(any(),
-                eq("testContext"), eq("putPscStatement"), eq(expectedUri),
-                any(PscStatementsPut.class));
+        // when
+        apiClientService.invokePscStatementPutRequest(COMPANY_NUMBER, STATEMENT_ID, companyPscStatement);
+
+        // then
+        verify(privateDeltaResourceHandler).putPscStatements(formattedUri, companyPscStatement);
+        verify(responseHandler).handle(any(ApiErrorResponseException.class));
     }
 
     @Test
-    public void returnOkResponseWhenValidDeleteRequestSentToApi() {
-        String expectedUri = String.format(uri, companyNumber, statementId);
-        when(responseHandlerFactory.createResponseHandler(any())).thenReturn(deleteResponseHandler);
-        when(deleteResponseHandler.handleApiResponse(any(), anyString(),
-                anyString(), anyString(),
-                any(PscStatementsDelete.class))).thenReturn(apiResponse);
+    void shouldSendPutRequestAndHandleURIValidationExceptionFromApi() throws Exception {
+        // given
+        when(internalApiClientSupplier.get()).thenReturn(internalApiClient);
+        when(internalApiClient.privateDeltaResourceHandler()).thenReturn(privateDeltaResourceHandler);
+        when(privateDeltaResourceHandler.putPscStatements(anyString(), any(CompanyPscStatement.class))).thenReturn(
+                pscStatementsPut);
+        when(pscStatementsPut.execute()).thenThrow(URIValidationException.class);
 
-        ApiResponse<Void> actualResponse = apiClientService.invokePscStatementDeleteHandler(
-                contextId, companyNumber, statementId, deltaAt);
+        final String formattedUri = String.format(URI, COMPANY_NUMBER, STATEMENT_ID);
 
-        assertEquals(apiResponse, actualResponse);
-        verify(deleteResponseHandler).handleApiResponse(any(), eq("testContext"),
-                eq("deletePscStatement"), eq(expectedUri),
-                any(PscStatementsDelete.class));
+        // when
+        apiClientService.invokePscStatementPutRequest(COMPANY_NUMBER, STATEMENT_ID, companyPscStatement);
+
+        // then
+        verify(privateDeltaResourceHandler).putPscStatements(formattedUri, companyPscStatement);
+        verify(responseHandler).handle(any(URIValidationException.class));
+    }
+
+    @Test
+    void shouldSuccessfullySendDeleteRequestToApi() throws Exception {
+        // given
+        when(internalApiClientSupplier.get()).thenReturn(internalApiClient);
+        when(internalApiClient.privateDeltaResourceHandler()).thenReturn(privateDeltaResourceHandler);
+        when(privateDeltaResourceHandler.deletePscStatements(anyString(), anyString())).thenReturn(pscStatementsDelete);
+        when(pscStatementsDelete.execute()).thenReturn(SUCCESS_RESPONSE);
+
+        final String formattedUri = String.format(URI, COMPANY_NUMBER, STATEMENT_ID);
+
+        // when
+        apiClientService.invokePscStatementDeleteRequest(COMPANY_NUMBER, STATEMENT_ID, DELTA_AT);
+
+        // then
+        verify(privateDeltaResourceHandler).deletePscStatements(formattedUri, DELTA_AT);
+        verifyNoMoreInteractions(responseHandler);
+    }
+
+    @Test
+    void shouldSendDeleteRequestAndHandleNon200ResponseFromApi() throws Exception {
+        // given
+        when(internalApiClientSupplier.get()).thenReturn(internalApiClient);
+        when(internalApiClient.privateDeltaResourceHandler()).thenReturn(privateDeltaResourceHandler);
+        when(privateDeltaResourceHandler.deletePscStatements(anyString(), anyString())).thenReturn(pscStatementsDelete);
+        when(pscStatementsDelete.execute()).thenThrow(ApiErrorResponseException.class);
+
+        final String formattedUri = String.format(URI, COMPANY_NUMBER, STATEMENT_ID);
+
+        // when
+        apiClientService.invokePscStatementDeleteRequest(COMPANY_NUMBER, STATEMENT_ID, DELTA_AT);
+
+        // then
+        verify(privateDeltaResourceHandler).deletePscStatements(formattedUri, DELTA_AT);
+        verify(responseHandler).handle(any(ApiErrorResponseException.class));
+    }
+
+    @Test
+    void shouldSendDeleteRequestAndHandleURIValidationExceptionFromApi() throws Exception {
+        // given
+        when(internalApiClientSupplier.get()).thenReturn(internalApiClient);
+        when(internalApiClient.privateDeltaResourceHandler()).thenReturn(privateDeltaResourceHandler);
+        when(privateDeltaResourceHandler.deletePscStatements(anyString(), anyString())).thenReturn(pscStatementsDelete);
+        when(pscStatementsDelete.execute()).thenThrow(URIValidationException.class);
+
+        final String formattedUri = String.format(URI, COMPANY_NUMBER, STATEMENT_ID);
+
+        // when
+        apiClientService.invokePscStatementDeleteRequest(COMPANY_NUMBER, STATEMENT_ID, DELTA_AT);
+
+        // then
+        verify(privateDeltaResourceHandler).deletePscStatements(formattedUri, DELTA_AT);
+        verify(responseHandler).handle(any(URIValidationException.class));
     }
 }
 

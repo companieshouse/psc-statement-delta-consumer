@@ -20,12 +20,24 @@ Feature: Psc Statements
     When a message with invalid data is sent
     Then the message should retry 3 times and then error
 
-  Scenario: Process message when the data api returns 400
+  Scenario Outline: Process message when the data api returns non-retryable status code
     Given the application is running
-    When the consumer receives a message failed_to_confirm but the data api returns a 400
+    When the consumer receives a message failed_to_confirm but the data api returns a <status_code>
     Then the message should be moved to topic psc-statement-delta-invalid
+    Examples:
+      | status_code |
+      | 400         |
+      | 409         |
 
-  Scenario: Process message when the data api returns 503
+  Scenario Outline: Process message when the data api returns retryable status code
     Given the application is running
-    When the consumer receives a message failed_to_confirm but the data api returns a 503
+    When the consumer receives a message failed_to_confirm but the data api returns a <status_code>
     Then the message should retry 3 times and then error
+    Examples:
+      | status_code |
+      | 401         |
+      | 403         |
+      | 404         |
+      | 405         |
+      | 500         |
+      | 503         |

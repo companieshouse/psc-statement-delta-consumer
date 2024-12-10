@@ -19,7 +19,6 @@ import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.pscstatement.delta.logging.DataMapHolder;
 import uk.gov.companieshouse.pscstatement.delta.processor.PscStatementDeltaProcessor;
 
-
 @Component
 public class PscStatementDeltaConsumer {
 
@@ -50,14 +49,11 @@ public class PscStatementDeltaConsumer {
             @Header(KafkaHeaders.RECEIVED_PARTITION) String partition,
             @Header(KafkaHeaders.OFFSET) String offset) {
         ChsDelta chsDelta = message.getPayload();
-        String contextId = chsDelta.getContextId();
         if (chsDelta.getIsDelete()) {
-            LOGGER.infoContext(contextId, "Delete message received",
-                    DataMapHolder.getLogMap());
+            LOGGER.info("Delete message received", DataMapHolder.getLogMap());
             deltaProcessor.processDeleteDelta(message);
         } else {
-            LOGGER.infoContext(contextId, "Resource changed message received",
-                    DataMapHolder.getLogMap());
+            LOGGER.info("Resource changed message received", DataMapHolder.getLogMap());
             deltaProcessor.processDelta(message);
         }
     }

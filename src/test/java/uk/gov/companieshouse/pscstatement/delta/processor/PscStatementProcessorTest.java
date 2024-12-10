@@ -30,7 +30,7 @@ import uk.gov.companieshouse.pscstatement.delta.utils.TestHelper;
 
 
 @ExtendWith(MockitoExtension.class)
-public class PscStatementProcessorTest {
+class PscStatementProcessorTest {
 
     private final TestHelper testHelper = new TestHelper();
     @Mock
@@ -57,7 +57,7 @@ public class PscStatementProcessorTest {
         assertThrows(RetryableErrorException.class,
                 () -> deltaProcessor.processDelta(mockChsDeltaMessage));
         Mockito.verify(apiClientService, times(0)).
-                invokePscStatementPutHandler(any(), any(), any(), any());
+                invokePscStatementPutRequest(any(), any(), any());
     }
 
     @Test
@@ -69,7 +69,7 @@ public class PscStatementProcessorTest {
         Assertions.assertDoesNotThrow(() -> deltaProcessor.processDelta(mockChsDeltaMessage));
         verify(transformer).transform(any(PscStatement.class));
         Mockito.verify(apiClientService, times(1)).
-                invokePscStatementPutHandler(any(), any(), any(), any());
+                invokePscStatementPutRequest(any(), any(), any());
 
     }
 
@@ -79,7 +79,7 @@ public class PscStatementProcessorTest {
         assertThrows(RetryableErrorException.class,
                 () -> deltaProcessor.processDeleteDelta(mockChsDeltaMessage));
         Mockito.verify(apiClientService, times(0)).
-                invokePscStatementDeleteHandler(any(), any(), any(), any());
+                invokePscStatementDeleteRequest(any(), any(), any());
     }
 
     @Test
@@ -88,6 +88,6 @@ public class PscStatementProcessorTest {
         Message<ChsDelta> mockChsDeltaMessage = testHelper.createChsDeltaMessage(true);
         Assertions.assertDoesNotThrow(() -> deltaProcessor.processDeleteDelta(mockChsDeltaMessage));
         Mockito.verify(apiClientService, times(1)).
-                invokePscStatementDeleteHandler(any(), any(), any(), any());
+                invokePscStatementDeleteRequest(any(), any(), any());
     }
 }
