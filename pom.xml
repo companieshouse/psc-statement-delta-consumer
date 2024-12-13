@@ -30,9 +30,9 @@
         <api-helper-java-library.version>3.0.1</api-helper-java-library.version>
 
         <!-- Tests -->
-        <io-cucumber.version>7.18.1</io-cucumber.version>
+        <io-cucumber.version>7.20.1</io-cucumber.version>
         <assertj-core.version>3.26.3</assertj-core.version>
-        <wiremock.standalone.version>3.9.1</wiremock.standalone.version>
+        <wiremock.standalone.version>3.10.0</wiremock.standalone.version>
         <skip.unit.tests>false</skip.unit.tests>
         <skip.integration.tests>false</skip.integration.tests>
 
@@ -80,6 +80,11 @@
             <artifactId>xmlunit-core</artifactId>
             <version>2.10.0</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>6.2.1</version>
         </dependency>
         <!--		Transitive deps end here-->
         <dependency>
