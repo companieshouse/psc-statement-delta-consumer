@@ -13,7 +13,7 @@ import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.pscstatement.delta.processor.PscStatementDeltaProcessor;
 
 @ExtendWith(MockitoExtension.class)
-public class PscStatementDeltaConsumerTest {
+class PscStatementDeltaConsumerTest {
 
     @Mock
     PscStatementDeltaProcessor processor;
@@ -29,7 +29,7 @@ public class PscStatementDeltaConsumerTest {
         Message<ChsDelta> message = MessageBuilder.createMessage(delta,
                 new MessageHeaders(new HashMap<>()));
 
-        consumer.receiveMainMessages(message, "topic", "partition", "offset");
+        consumer.receiveMainMessages(message);
 
         Mockito.verify(processor, Mockito.times(1)).processDelta(message);
     }
@@ -45,7 +45,7 @@ public class PscStatementDeltaConsumerTest {
         Message<ChsDelta> message = MessageBuilder.createMessage(delta,
                 new MessageHeaders(new HashMap<>()));
 
-        consumer.receiveMainMessages(message, "topic", "partition", "offset");
+        consumer.receiveMainMessages(message);
 
         Mockito.verify(processor, Mockito.times(1)).processDeleteDelta(message);
     }

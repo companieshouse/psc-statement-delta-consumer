@@ -4,6 +4,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
 /**
  * Loads the application context. Best place to mock your downstream calls.
@@ -14,4 +16,8 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles({"test"})
 public abstract class AbstractIntegrationTest {
 
+    @DynamicPropertySource
+    static void props(DynamicPropertyRegistry registry) {
+        registry.add("psc-statement.delta.backoff-delay", () -> 100);
+    }
 }

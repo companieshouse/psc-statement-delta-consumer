@@ -8,9 +8,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.kafka.retrytopic.DltStrategy;
 import org.springframework.kafka.retrytopic.SameIntervalTopicReuseStrategy;
-import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.delta.ChsDelta;
@@ -44,10 +42,7 @@ public class PscStatementDeltaConsumer {
     @KafkaListener(topics = "${psc-statement.delta.topic}",
             groupId = "${psc-statement.delta.group-id}",
             containerFactory = "listenerContainerFactory")
-    public void receiveMainMessages(Message<ChsDelta> message,
-            @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION) String partition,
-            @Header(KafkaHeaders.OFFSET) String offset) {
+    public void receiveMainMessages(Message<ChsDelta> message) {
         ChsDelta chsDelta = message.getPayload();
         if (chsDelta.getIsDelete()) {
             LOGGER.info("Delete message received", DataMapHolder.getLogMap());
