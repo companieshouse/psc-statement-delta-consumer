@@ -10,16 +10,24 @@ Feature: Psc Statements delete
     When the consumer receives an invalid delete payload
     Then the message should retry 3 times and then error
 
-  Scenario: send DELETE with 400 from data api
+  Scenario Outline: send DELETE with 400 from data api
     Given the application is running
-    When the consumer receives a delete message but the data api returns a 400
+    When the consumer receives a delete message but the data api returns a <status_code>
     Then the message should be moved to topic psc-statement-delta-invalid
+    Examples:
+      | status_code |
+      | 400         |
+      | 409         |
 
   Scenario Outline: send DELETE with retryable response from data api
     Given the application is running
-    When the consumer receives a delete message but the data api returns a <code>
+    When the consumer receives a delete message but the data api returns a <status_code>
     Then the message should retry 3 times and then error
     Examples:
-      | code |
-      | 404  |
-      | 503  |
+      | status_code |
+      | 401         |
+      | 403         |
+      | 404         |
+      | 405         |
+      | 500         |
+      | 503         |
