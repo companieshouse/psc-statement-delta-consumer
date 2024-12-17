@@ -50,7 +50,6 @@ public class PscStatementDeltaProcessor {
         final String contextId = payload.getContextId();
 
         CompanyPscStatement companyPscStatement = new CompanyPscStatement();
-
         ObjectMapper mapper = new ObjectMapper();
         PscStatementDelta pscStatementDelta;
         try {
@@ -75,8 +74,9 @@ public class PscStatementDeltaProcessor {
                     "Error when extracting psc-statement delta", ex);
         }
 
+        final String statementId = mapperUtils.encode(companyPscStatement.getPscStatementIdRaw());
         apiClientService.invokePscStatementPutRequest(companyPscStatement.getCompanyNumber(),
-                companyPscStatement.getPscStatementId(), companyPscStatement);
+                statementId, companyPscStatement);
     }
 
     /**

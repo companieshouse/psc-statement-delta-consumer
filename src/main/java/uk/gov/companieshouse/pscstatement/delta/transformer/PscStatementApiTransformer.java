@@ -35,8 +35,7 @@ public class PscStatementApiTransformer {
             Statement statement = mapper.pscStatementToStatement(pscStatement);
             CompanyPscStatement companyPscStatement = new CompanyPscStatement();
             companyPscStatement.setCompanyNumber(pscStatement.getCompanyNumber());
-            companyPscStatement.setPscStatementId(mapperUtils
-                    .encode(pscStatement.getPscStatementId()));
+            companyPscStatement.setPscStatementIdRaw(pscStatement.getPscStatementId());
             companyPscStatement.setStatement(statement);
             return companyPscStatement;
         } catch (Exception exception) {
