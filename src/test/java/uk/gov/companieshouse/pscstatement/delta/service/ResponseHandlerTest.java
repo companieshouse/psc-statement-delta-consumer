@@ -1,103 +1,67 @@
 package uk.gov.companieshouse.pscstatement.delta.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.spy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-import com.google.api.client.http.HttpHeaders;
-import com.google.api.client.http.HttpResponseException;
 import consumer.exception.NonRetryableErrorException;
 import consumer.exception.RetryableErrorException;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import uk.gov.companieshouse.api.error.ApiErrorResponseException;
-import uk.gov.companieshouse.api.handler.delta.pscstatements.request.PscStatementsDelete;
 import uk.gov.companieshouse.api.handler.exception.URIValidationException;
-import uk.gov.companieshouse.api.model.ApiResponse;
-import uk.gov.companieshouse.logging.Logger;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
 @ExtendWith(MockitoExtension.class)
-public class ResponseHandlerTest {
+class ResponseHandlerTest {
 
-    private ResponseHandler responseHandler;
-
-    @Mock
-    private Logger logger;
+    private final ResponseHandler responseHandler = new ResponseHandler();
 
     @Mock
-    private PscStatementsDelete pscStatementsDelete;
+    private ApiErrorResponseException apiErrorResponseException;
 
-    @BeforeEach
-    public void setUp() {
-        responseHandler = new ResponseHandler();
+    @ParameterizedTest
+    @MethodSource("scenarios")
+    void shouldHandleApiErrorResponseScenarios(HttpStatus apiResponseStatus,
+            Class<RuntimeException> expectedException) {
+        // given
+        when(apiErrorResponseException.getStatusCode()).thenReturn(apiResponseStatus.value());
+
+        // when
+        Executable executable = () -> responseHandler.handle(apiErrorResponseException);
+
+        // then
+        assertThrows(expectedException, executable);
     }
 
     @Test
-    public void returnOkResponseFromDataApi()
-            throws ApiErrorResponseException, URIValidationException {
-        ApiResponse<Void> expectedResponse = new ApiResponse<>(200, null, null);
-        when(pscStatementsDelete.execute()).thenReturn(expectedResponse);
+    void shouldHandleURIValidationException() {
+        // given
+        URIValidationException exception = new URIValidationException("Invalid URI");
 
-        ApiResponse<Void> response = responseHandler.
-                handleApiResponse(logger, null, null, null, pscStatementsDelete);
-        assertEquals(response, expectedResponse);
+        // when
+        Executable executable = () -> responseHandler.handle(exception);
+
+        // then
+        assertThrows(NonRetryableErrorException.class, executable);
     }
 
-    @Test
-    public void throwValidationErrorResponse()
-            throws ApiErrorResponseException, URIValidationException {
-        when(pscStatementsDelete.execute()).thenThrow(new URIValidationException("invalid path"));
-
-        RetryableErrorException thrown = assertThrows(RetryableErrorException.class, () -> {
-            responseHandler.
-                    handleApiResponse(logger, null, null, null, pscStatementsDelete);
-        });
-        assertEquals("Invalid path specified", thrown.getMessage());
-    }
-
-    @Test
-    public void throwApiErrorResponseOn400()
-            throws ApiErrorResponseException, URIValidationException {
-        HttpResponseException.Builder builder = new HttpResponseException.Builder(400,
-                "BAD_REQUEST", new HttpHeaders());
-        when(pscStatementsDelete.execute()).thenThrow(new ApiErrorResponseException(builder));
-
-        NonRetryableErrorException thrown = assertThrows(NonRetryableErrorException.class, () -> {
-            responseHandler.
-                    handleApiResponse(logger, null, null, null, pscStatementsDelete);
-        });
-        assertEquals("400 BAD_REQUEST response received from psc-statements-data-api",
-                thrown.getMessage());
-    }
-
-    @Test
-    public void throwErrorResponseOn404() throws ApiErrorResponseException, URIValidationException {
-        HttpResponseException.Builder builder = new HttpResponseException.Builder(404,
-                "server error", new HttpHeaders());
-        when(pscStatementsDelete.execute()).thenThrow(new ApiErrorResponseException(builder));
-
-        RetryableErrorException thrown = assertThrows(RetryableErrorException.class, () -> {
-            responseHandler.
-                    handleApiResponse(logger, null, null, null, pscStatementsDelete);
-        });
-        assertEquals("server error with 404 NOT_FOUND returned from psc-statements-data-api",
-                thrown.getMessage());
-    }
-
-    @Test
-    public void throwErrorResponseOn500() {
-        ResponseHandler spyHandler = spy(responseHandler);
-        doThrow(RetryableErrorException.class).when(spyHandler).handleApiResponse(logger, null,
-                null, null, pscStatementsDelete);
-
-        assertThrows(RetryableErrorException.class, () -> {
-            spyHandler.handleApiResponse(logger, null, null, null, pscStatementsDelete);
-        });
+    private static Stream<Arguments> scenarios() {
+        return Stream.of(
+                Arguments.of(HttpStatus.BAD_REQUEST, NonRetryableErrorException.class),
+                Arguments.of(HttpStatus.CONFLICT, NonRetryableErrorException.class),
+                Arguments.of(HttpStatus.UNAUTHORIZED, RetryableErrorException.class),
+                Arguments.of(HttpStatus.FORBIDDEN, RetryableErrorException.class),
+                Arguments.of(HttpStatus.NOT_FOUND, RetryableErrorException.class),
+                Arguments.of(HttpStatus.METHOD_NOT_ALLOWED, RetryableErrorException.class),
+                Arguments.of(HttpStatus.INTERNAL_SERVER_ERROR, RetryableErrorException.class),
+                Arguments.of(HttpStatus.SERVICE_UNAVAILABLE, RetryableErrorException.class)
+        );
     }
 }

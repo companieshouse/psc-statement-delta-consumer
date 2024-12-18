@@ -30,33 +30,32 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.logging.Logger;
-import uk.gov.companieshouse.pscstatement.delta.matcher.CustomRequestMatcher;
 import uk.gov.companieshouse.pscstatement.delta.data.TestData;
+import uk.gov.companieshouse.pscstatement.delta.matcher.CustomRequestMatcher;
 
 public class PscStatementsSteps {
 
+    private static final int PORT = 8888;
+
     private static WireMockServer wireMockServer;
+
     @Autowired
     public KafkaConsumer<String, Object> kafkaConsumer;
     @Value("${psc-statement.delta.topic}")
     private String mainTopic;
-    @Value("${wiremock.server.port}")
-    private String port;
     @Autowired
     private Logger logger;
 
     private String output;
 
-
     @Autowired
     private KafkaTemplate<String, Object> kafkaTemplate;
 
     private void configureWiremock() {
-        wireMockServer = new WireMockServer(Integer.parseInt(port));
+        wireMockServer = new WireMockServer(PORT);
         wireMockServer.start();
-        configureFor("localhost", Integer.parseInt(port));
+        configureFor("localhost", PORT);
     }
-
 
     @Given("the application is running")
     public void theApplicationRunning() {
