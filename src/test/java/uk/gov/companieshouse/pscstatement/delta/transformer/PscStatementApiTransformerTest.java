@@ -44,7 +44,6 @@ public class PscStatementApiTransformerTest {
 
         CompanyPscStatement expectedCPS = new CompanyPscStatement();
         expectedCPS.setStatement(mockStatement);
-        expectedCPS.setPscStatementId("yPf-Ow5BvoRtVodZLPIBj_biJoc");
 
         assertEquals(expectedCPS, actualCompanyPscStatement);
     }
