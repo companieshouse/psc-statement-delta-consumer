@@ -86,6 +86,11 @@
             <artifactId>spring-webmvc</artifactId>
             <version>6.2.1</version>
         </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>1.5.13</version>
+        </dependency>
         <!--		Transitive deps end here-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

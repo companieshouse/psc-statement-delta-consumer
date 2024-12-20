@@ -1,8 +1,6 @@
 package uk.gov.companieshouse.pscstatement.delta.processor;
 
-import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -14,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -32,8 +31,10 @@ import uk.gov.companieshouse.pscstatement.delta.utils.TestHelper;
 @ExtendWith(MockitoExtension.class)
 class PscStatementProcessorTest {
 
+    private static final String PSC_STATEMENT_ID_RAW = "3000000002";
+    private static final String COMPANY_NUMBER = "09950914";
+
     private final TestHelper testHelper = new TestHelper();
-    @Mock
     CompanyPscStatement mockCompanyPscStatement;
     private PscStatementDeltaProcessor deltaProcessor;
     @Mock
@@ -49,45 +50,69 @@ class PscStatementProcessorTest {
         deltaProcessor = new PscStatementDeltaProcessor(logger, apiClientService, transformer);
         mapperUtils = new MapperUtils();
         ReflectionTestUtils.setField(deltaProcessor, "mapperUtils", mapperUtils);
+
     }
 
     @Test
     void When_InvalidChsDeltaMessage_Expect_RetryableError() {
+        // given
         Message<ChsDelta> mockChsDeltaMessage = testHelper.createInvalidChsDeltaMessage();
-        assertThrows(RetryableErrorException.class,
-                () -> deltaProcessor.processDelta(mockChsDeltaMessage));
-        Mockito.verify(apiClientService, times(0)).
-                invokePscStatementPutRequest(any(), any(), any());
+
+        // when
+        Executable actual = () -> deltaProcessor.processDelta(mockChsDeltaMessage);
+
+        // then
+        Assertions.assertThrows(RetryableErrorException.class, actual);
+        Mockito.verifyNoInteractions(apiClientService);
     }
 
     @Test
     @DisplayName("Confirms the Processor does not throw when a valid ChsDelta is given")
     void When_ValidChsDeltaMessage_Expect_ProcessorDoesNotThrow_CallsTransformer()
             throws IOException {
+        // given
         Message<ChsDelta> mockChsDeltaMessage = testHelper.createChsDeltaMessage(false);
+        mockCompanyPscStatement = new CompanyPscStatement();
+        mockCompanyPscStatement.setPscStatementIdRaw(PSC_STATEMENT_ID_RAW);
+        mockCompanyPscStatement.setCompanyNumber(COMPANY_NUMBER);
+        String pscStatementIdEncoded = mapperUtils.encode(PSC_STATEMENT_ID_RAW);
         when(transformer.transform(any(PscStatement.class))).thenReturn(mockCompanyPscStatement);
-        Assertions.assertDoesNotThrow(() -> deltaProcessor.processDelta(mockChsDeltaMessage));
+
+        // when
+        deltaProcessor.processDelta(mockChsDeltaMessage);
+
+        // then
         verify(transformer).transform(any(PscStatement.class));
-        Mockito.verify(apiClientService, times(1)).
-                invokePscStatementPutRequest(any(), any(), any());
+        Mockito.verify(apiClientService).
+                invokePscStatementPutRequest(COMPANY_NUMBER, pscStatementIdEncoded, mockCompanyPscStatement);
 
     }
 
     @Test
     void When_InvalidChsDeleteDeltaMessage_Expect_RetryableError() {
+        // given
         Message<ChsDelta> mockChsDeltaMessage = testHelper.createInvalidChsDeltaMessage();
-        assertThrows(RetryableErrorException.class,
-                () -> deltaProcessor.processDeleteDelta(mockChsDeltaMessage));
-        Mockito.verify(apiClientService, times(0)).
-                invokePscStatementDeleteRequest(any(), any(), any());
+
+        // when
+        Executable actual = () -> deltaProcessor.processDeleteDelta(mockChsDeltaMessage);
+
+        // given
+        Assertions.assertThrows(RetryableErrorException.class, actual);
+        Mockito.verifyNoInteractions(apiClientService);
     }
 
     @Test
     @DisplayName("Confirms the Processor does not throw when a valid delete ChsDelta is given")
     void When_ValidChsDeleteDeltaMessage_Expect_ProcessorDoesNotThrow() throws IOException {
+        // given
         Message<ChsDelta> mockChsDeltaMessage = testHelper.createChsDeltaMessage(true);
-        Assertions.assertDoesNotThrow(() -> deltaProcessor.processDeleteDelta(mockChsDeltaMessage));
-        Mockito.verify(apiClientService, times(1)).
-                invokePscStatementDeleteRequest(any(), any(), any());
+        String pscStatementIdEncoded = mapperUtils.encode(PSC_STATEMENT_ID_RAW);
+
+        // when
+        deltaProcessor.processDeleteDelta(mockChsDeltaMessage);
+
+        // then
+        Mockito.verify(apiClientService).
+                invokePscStatementDeleteRequest(COMPANY_NUMBER, pscStatementIdEncoded, "20230724093435661593");
     }
 }

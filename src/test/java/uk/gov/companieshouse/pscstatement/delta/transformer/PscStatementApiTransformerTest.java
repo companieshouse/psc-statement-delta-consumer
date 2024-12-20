@@ -17,7 +17,7 @@ import uk.gov.companieshouse.api.psc.Statement;
 import uk.gov.companieshouse.pscstatement.delta.mapper.StatementMapper;
 
 @ExtendWith(SpringExtension.class)
-public class PscStatementApiTransformerTest {
+class PscStatementApiTransformerTest {
 
     @Mock
     private StatementMapper mapper;
@@ -32,7 +32,7 @@ public class PscStatementApiTransformerTest {
     }
 
     @Test
-    public void transformerReturnsCompanyPscStatement() {
+    void transformerReturnsCompanyPscStatement() {
         Statement mockStatement = mock(Statement.class);
         when(mapper.pscStatementToStatement(pscStatement)).thenReturn(mockStatement);
         CompanyPscStatement actualCompanyPscStatement = transformer.transform(pscStatement);
@@ -44,7 +44,7 @@ public class PscStatementApiTransformerTest {
     }
 
     @Test
-    public void transformerThrowsExceptionCompanyPscStatement() {
+    void transformerThrowsExceptionCompanyPscStatement() {
         when(mapper.pscStatementToStatement(pscStatement)).thenThrow(
                 NonRetryableErrorException.class);
 
