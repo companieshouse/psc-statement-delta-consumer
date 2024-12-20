@@ -11,11 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.companieshouse.api.delta.PscStatement;
 import uk.gov.companieshouse.api.psc.CompanyPscStatement;
 import uk.gov.companieshouse.api.psc.Statement;
-import uk.gov.companieshouse.pscstatement.delta.mapper.MapperUtils;
 import uk.gov.companieshouse.pscstatement.delta.mapper.StatementMapper;
 
 @ExtendWith(SpringExtension.class)
@@ -26,14 +24,11 @@ public class PscStatementApiTransformerTest {
 
     private PscStatementApiTransformer transformer;
     private PscStatement pscStatement;
-    private MapperUtils mapperUtils;
 
     @BeforeEach
     public void setUp() {
         transformer = new PscStatementApiTransformer(mapper);
         pscStatement = new PscStatement();
-        mapperUtils = new MapperUtils();
-        ReflectionTestUtils.setField(transformer, "mapperUtils", mapperUtils);
     }
 
     @Test
