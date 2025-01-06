@@ -1,11 +1,11 @@
 package uk.gov.companieshouse.pscstatement.delta.processor;
 
 import static java.lang.String.format;
+import static uk.gov.companieshouse.pscstatement.delta.PscStatementDeltaConsumerApplication.APPLICATION_NAME_SPACE;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import consumer.exception.RetryableErrorException;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 import uk.gov.companieshouse.api.delta.PscStatement;
@@ -14,6 +14,7 @@ import uk.gov.companieshouse.api.delta.PscStatementDelta;
 import uk.gov.companieshouse.api.psc.CompanyPscStatement;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.logging.Logger;
+import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.pscstatement.delta.logging.DataMapHolder;
 import uk.gov.companieshouse.pscstatement.delta.mapper.MapperUtils;
 import uk.gov.companieshouse.pscstatement.delta.service.ApiClientService;
@@ -22,23 +23,20 @@ import uk.gov.companieshouse.pscstatement.delta.transformer.PscStatementApiTrans
 @Component
 public class PscStatementDeltaProcessor {
 
+    private static final Logger logger = LoggerFactory.getLogger(APPLICATION_NAME_SPACE);
+
     private final PscStatementApiTransformer transformer;
-    private final Logger logger;
-
     private final ApiClientService apiClientService;
-
-    @Autowired
-    private MapperUtils mapperUtils;
+    private final MapperUtils mapperUtils;
 
     /**
      * processor constructor.
      */
-    @Autowired
-    public PscStatementDeltaProcessor(Logger logger, ApiClientService apiClientService,
-            PscStatementApiTransformer transformer) {
-        this.logger = logger;
-        this.apiClientService = apiClientService;
+    public PscStatementDeltaProcessor(PscStatementApiTransformer transformer, ApiClientService apiClientService,
+            MapperUtils mapperUtils) {
         this.transformer = transformer;
+        this.apiClientService = apiClientService;
+        this.mapperUtils = mapperUtils;
     }
 
     /**
@@ -50,7 +48,6 @@ public class PscStatementDeltaProcessor {
         final String contextId = payload.getContextId();
 
         CompanyPscStatement companyPscStatement = new CompanyPscStatement();
-
         ObjectMapper mapper = new ObjectMapper();
         PscStatementDelta pscStatementDelta;
         try {
@@ -75,8 +72,9 @@ public class PscStatementDeltaProcessor {
                     "Error when extracting psc-statement delta", ex);
         }
 
+        final String statementId = mapperUtils.encode(companyPscStatement.getPscStatementIdRaw());
         apiClientService.invokePscStatementPutRequest(companyPscStatement.getCompanyNumber(),
-                companyPscStatement.getPscStatementId(), companyPscStatement);
+                statementId, companyPscStatement);
     }
 
     /**

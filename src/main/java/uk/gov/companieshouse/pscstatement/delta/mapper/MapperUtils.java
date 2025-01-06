@@ -8,15 +8,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class MapperUtils {
 
-    @Value("${encoding.salt}")
-    private String salt;
+    private final String salt;
+
+    public MapperUtils(@Value("${encoding.salt}") String salt) {
+        this.salt = salt;
+    }
 
     /**
      * encode the String passed in for use in links and ids.
      */
     public String encode(String unencodedString) {
-        String encodedString = Base64.getUrlEncoder().withoutPadding().encodeToString(
-                DigestUtils.sha1(unencodedString + salt));
-        return encodedString;
+        return Base64.getUrlEncoder()
+                .withoutPadding()
+                .encodeToString(DigestUtils.sha1(unencodedString + salt));
     }
 }
