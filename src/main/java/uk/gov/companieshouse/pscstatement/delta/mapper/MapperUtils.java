@@ -10,7 +10,7 @@ public class MapperUtils {
 
     private final String salt;
 
-    public MapperUtils(@Value("${encoding.salt}")String salt) {
+    public MapperUtils(@Value("${encoding.salt}") String salt) {
         this.salt = salt;
     }
 
