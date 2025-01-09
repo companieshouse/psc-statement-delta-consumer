@@ -49,15 +49,16 @@ public class PscStatementDeltaProcessor {
                 companyPscStatement = transformer.transform(pscStatement);
                 companyPscStatement.setDeltaAt(pscStatementDelta.getDeltaAt());
                 final String companyNumber = companyPscStatement.getCompanyNumber();
-                DataMapHolder.get().companyNumber(companyNumber)
-                        .pscStatementIdRaw(companyPscStatement.getPscStatementIdRaw());
             }
         } catch (Exception ex) {
             throw new RetryableErrorException(
                     "Error when extracting psc-statement delta", ex);
         }
-
         final String statementId = mapperUtils.encode(companyPscStatement.getPscStatementIdRaw());
+        DataMapHolder.get()
+                .companyNumber(companyPscStatement.getCompanyNumber())
+                .pscStatementId(statementId)
+                .pscStatementIdRaw(companyPscStatement.getPscStatementIdRaw());
         apiClientService.invokePscStatementPutRequest(companyPscStatement.getCompanyNumber(),
                 statementId, companyPscStatement);
     }
