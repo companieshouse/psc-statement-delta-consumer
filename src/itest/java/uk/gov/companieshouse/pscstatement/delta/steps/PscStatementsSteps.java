@@ -35,7 +35,6 @@ import uk.gov.companieshouse.pscstatement.delta.data.TestData;
 import uk.gov.companieshouse.pscstatement.delta.matcher.CustomRequestMatcher;
 
 public class PscStatementsSteps {
-    private static final Logger logger = LoggerFactory.getLogger("psc-statement-delta-consumer");
     private static final int PORT = 8888;
     private static WireMockServer wireMockServer;
 
@@ -128,7 +127,7 @@ public class PscStatementsSteps {
 
     @Then("a PUT request is sent to the psc statement data api with the encoded data")
     public void put_sent_to_data_api() {
-        verify(1, requestMadeFor(new CustomRequestMatcher(logger, output,
+        verify(1, requestMadeFor(new CustomRequestMatcher(output,
                 "/company/08694860/persons-with-significant-control-statements/I5tVa-U7URp5pDuXSyEQ8NILVWU/internal",
                 List.of("statement.etag"))));
     }
