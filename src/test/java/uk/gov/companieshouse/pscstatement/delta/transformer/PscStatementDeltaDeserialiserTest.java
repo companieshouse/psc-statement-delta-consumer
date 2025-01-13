@@ -33,7 +33,7 @@ class PscStatementDeltaDeserialiserTest {
     private PscStatementDeleteDelta expectedDeleteDelta;
 
     @Test
-    void shouldDeserialiseFilingHistoryDelta() throws JsonProcessingException {
+    void shouldDeserialiseToPscStatementDelta() throws JsonProcessingException {
         // given
         when(objectMapper.readValue(anyString(), eq(PscStatementDelta.class))).thenReturn(expectedDelta);
 
@@ -62,7 +62,7 @@ class PscStatementDeltaDeserialiserTest {
     }
 
     @Test
-    void shouldDeserialiseFilingHistoryDeleteDelta() throws JsonProcessingException {
+    void shouldDeserialiseToPscStatementDeleteDelta() throws JsonProcessingException {
         // given
         when(objectMapper.readValue(anyString(), eq(PscStatementDeleteDelta.class))).thenReturn(expectedDeleteDelta);
 
