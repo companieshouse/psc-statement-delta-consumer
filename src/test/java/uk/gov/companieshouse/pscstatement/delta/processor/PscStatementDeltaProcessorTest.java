@@ -2,12 +2,15 @@ package uk.gov.companieshouse.pscstatement.delta.processor;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import consumer.exception.RetryableErrorException;
 import java.io.IOException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,25 +20,26 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.Message;
 import uk.gov.companieshouse.api.delta.PscStatement;
+import uk.gov.companieshouse.api.delta.PscStatementDelta;
 import uk.gov.companieshouse.api.psc.CompanyPscStatement;
 import uk.gov.companieshouse.delta.ChsDelta;
 import uk.gov.companieshouse.pscstatement.delta.mapper.MapperUtils;
 import uk.gov.companieshouse.pscstatement.delta.service.ApiClientService;
 import uk.gov.companieshouse.pscstatement.delta.transformer.PscStatementApiTransformer;
+import uk.gov.companieshouse.pscstatement.delta.transformer.PscStatementDeltaDeserialiser;
 import uk.gov.companieshouse.pscstatement.delta.utils.TestHelper;
 
 
 @ExtendWith(MockitoExtension.class)
-class PscStatementProcessorTest {
+class PscStatementDeltaProcessorTest {
 
     private static final String PSC_STATEMENT_ID_RAW = "3000000002";
     private static final String COMPANY_NUMBER = "09950914";
     private static final String ENCODED_ID = "encodedId";
-
     private final TestHelper testHelper = new TestHelper();
-
-    @InjectMocks
     private PscStatementDeltaProcessor deltaProcessor;
+    private PscStatementDeltaDeserialiser deltaDeserialiser;
+
     @Mock
     private ApiClientService apiClientService;
     @Mock
@@ -43,17 +47,11 @@ class PscStatementProcessorTest {
     @Mock
     private MapperUtils mapperUtils;
 
-    @Test
-    void When_InvalidChsDeltaMessage_Expect_RetryableError() {
-        // given
-        Message<ChsDelta> mockChsDeltaMessage = testHelper.createInvalidChsDeltaMessage();
-
-        // when
-        Executable actual = () -> deltaProcessor.processDelta(mockChsDeltaMessage);
-
-        // then
-        assertThrows(RetryableErrorException.class, actual);
-        verifyNoInteractions(apiClientService);
+    @BeforeEach
+    void setup() {
+        ObjectMapper mapper = new ObjectMapper();
+        deltaDeserialiser = new PscStatementDeltaDeserialiser(mapper);
+        deltaProcessor = new PscStatementDeltaProcessor(transformer, deltaDeserialiser, apiClientService, mapperUtils);
     }
 
     @Test
@@ -65,6 +63,7 @@ class PscStatementProcessorTest {
         CompanyPscStatement mockCompanyPscStatement = new CompanyPscStatement();
         mockCompanyPscStatement.setPscStatementIdRaw(PSC_STATEMENT_ID_RAW);
         mockCompanyPscStatement.setCompanyNumber(COMPANY_NUMBER);
+
         when(mapperUtils.encode(PSC_STATEMENT_ID_RAW)).thenReturn(ENCODED_ID);
         when(transformer.transform(any(PscStatement.class))).thenReturn(mockCompanyPscStatement);
 
@@ -75,21 +74,6 @@ class PscStatementProcessorTest {
         verify(transformer).transform(any(PscStatement.class));
         verify(mapperUtils).encode(PSC_STATEMENT_ID_RAW);
         verify(apiClientService).invokePscStatementPutRequest(COMPANY_NUMBER, ENCODED_ID, mockCompanyPscStatement);
-    }
-
-    @Test
-    void When_InvalidChsDeleteDeltaMessage_Expect_RetryableError() {
-        // given
-        Message<ChsDelta> mockChsDeltaMessage = testHelper.createInvalidChsDeltaMessage();
-
-        // when
-        Executable actual = () -> deltaProcessor.processDeleteDelta(mockChsDeltaMessage);
-
-        // given
-        assertThrows(RetryableErrorException.class, actual);
-        verifyNoInteractions(apiClientService);
-        verifyNoInteractions(mapperUtils);
-        verifyNoInteractions(apiClientService);
     }
 
     @Test
