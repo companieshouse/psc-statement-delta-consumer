@@ -15,24 +15,26 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>
-        <spring.boot.version>3.4.1</spring.boot.version>
+        <spring.boot.version>3.4.3</spring.boot.version>
+        <spring-webmvc.version>6.2.3</spring-webmvc.version>
         <main.class>uk.gov.companieshouse.pscstatement.delta.PscStatementDeltaConsumerApplication</main.class>
         <map-struct.version>1.6.3</map-struct.version>
-        <aspectjweaver.version>1.9.22</aspectjweaver.version>
+        <aspectjweaver.version>1.9.22.1</aspectjweaver.version>
         <avro.version>1.12.0</avro.version>
+        <xmlunit.version>2.10.0</xmlunit.version>
 
         <!--CH Dependencies-->
         <ch-kafka.version>3.0.3</ch-kafka.version>
-        <structured-logging.version>3.0.23</structured-logging.version>
-        <kafka-models.version>3.0.8</kafka-models.version>
-        <private-api-sdk-java.version>4.0.257</private-api-sdk-java.version>
-        <api-sdk-manager-java-library.version>3.0.5</api-sdk-manager-java-library.version>
+        <structured-logging.version>3.0.26</structured-logging.version>
+        <kafka-models.version>3.0.12</kafka-models.version>
+        <private-api-sdk-java.version>4.0.280</private-api-sdk-java.version>
+        <api-sdk-manager-java-library.version>3.0.6</api-sdk-manager-java-library.version>
         <api-helper-java-library.version>3.0.1</api-helper-java-library.version>
 
         <!-- Tests -->
-        <io-cucumber.version>7.20.1</io-cucumber.version>
-        <assertj-core.version>3.26.3</assertj-core.version>
-        <wiremock.standalone.version>3.10.0</wiremock.standalone.version>
+        <io-cucumber.version>7.21.1</io-cucumber.version>
+        <assertj-core.version>3.27.3</assertj-core.version>
+        <wiremock.standalone.version>3.12.1</wiremock.standalone.version>
         <skip.unit.tests>false</skip.unit.tests>
         <skip.integration.tests>false</skip.integration.tests>
 
@@ -53,11 +55,11 @@
         <!--Plugin Configuration-->
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
         <maven-build-helper-plugin.version>3.6.0</maven-build-helper-plugin.version>
-        <maven-surefire-plugin.version>3.4.0</maven-surefire-plugin.version>
-        <maven-failsafe-plugin.version>3.4.0</maven-failsafe-plugin.version>
+        <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
+        <maven-failsafe-plugin.version>3.5.2</maven-failsafe-plugin.version>
         <jib-maven-plugin.version>3.4.4</jib-maven-plugin.version>
     </properties>
 
@@ -78,13 +80,13 @@
         <dependency>
             <groupId>org.xmlunit</groupId>
             <artifactId>xmlunit-core</artifactId>
-            <version>2.10.0</version>
+            <version>${xmlunit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>6.2.1</version>
+            <version>${spring-webmvc.version}</version>
         </dependency>
         <!--		Transitive deps end here-->
         <dependency>
@@ -106,6 +108,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
