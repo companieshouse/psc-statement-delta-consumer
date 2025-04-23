@@ -125,3 +125,21 @@ variable "psc_statement_delta_consumer_version" {
   type        = string
   description = "The version of the psc-statement-delta-consumer container to run."
 }
+
+variable "task_healthcheck_interval" {
+  type        = string
+  description = "Health check interval configuration for ECS task definitions."
+}
+variable "task_healthcheck_timeout" {
+  type        = string
+  description = "Health check timeout configuration for ECS task definitions."
+}
+variable "task_healthcheck_retries" {
+  type        = string
+  description = "Health check retries configuration for ECS task definitions."
+}
+
+variable "task_healthcheck_startPeriod" {
+  type        = string
+  description = "Health check start period configuration for ECS task definitions."
+}

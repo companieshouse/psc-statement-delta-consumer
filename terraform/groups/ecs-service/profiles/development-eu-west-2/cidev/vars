@@ -9,3 +9,9 @@ service_autoscale_scale_out_cooldown = 600
 service_autoscale_enabled  = true
 service_scaledown_schedule = "55 19 * * ? *"
 service_scaleup_schedule   = "5 6 * * ? *"
+
+# use_task_container_healthcheck
+task_healthcheck_interval = "60"
+task_healthcheck_timeout = "5"
+task_healthcheck_retries = "3"
+task_healthcheck_startPeriod = "120"
