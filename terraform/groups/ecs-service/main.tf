@@ -19,7 +19,7 @@ terraform {
 }
 
 module "secrets" {
-  source = "git@github.com:companieshouse/terraform-modules//aws/ecs/secrets?ref=1.0.300"
+  source = "git@github.com:companieshouse/terraform-modules//aws/ecs/secrets?ref=1.0.319"
 
   name_prefix = "${local.service_name}-${var.environment}"
   environment = var.environment
@@ -28,7 +28,7 @@ module "secrets" {
 }
 
 module "ecs-service" {
-  source = "git@github.com:companieshouse/terraform-modules//aws/ecs/ecs-service?ref=1.0.300"
+  source = "git@github.com:companieshouse/terraform-modules//aws/ecs/ecs-service?ref=1.0.319"
   read_only_root_filesystem = false
 
   # Environmental configuration
@@ -44,6 +44,12 @@ module "ecs-service" {
   use_task_container_healthcheck = true
   healthcheck_path               = local.healthcheck_path
   healthcheck_matcher            = local.healthcheck_matcher
+
+ # Pass health check configuration, including optional startPeriod
+  task_healthcheck_interval     = var.task_healthcheck_interval
+  task_healthcheck_timeout      = var.task_healthcheck_timeout
+  task_healthcheck_retries      = var.task_healthcheck_retries
+  task_healthcheck_start_period  = var.task_healthcheck_start_period
 
   # Docker container details
   docker_registry   = var.docker_registry
