@@ -114,18 +114,15 @@ variable "ssm_version_prefix" {
   description = "String to use as a prefix to the names of the variables containing variables and secrets version."
   default     = "SSM_VERSION_"
 }
-
 variable "use_set_environment_files" {
   type        = bool
   default     = false
   description = "Toggle default global and shared environment files"
 }
-
 variable "psc_statement_delta_consumer_version" {
   type        = string
   description = "The version of the psc-statement-delta-consumer container to run."
 }
-
 variable "task_healthcheck_interval" {
   type        = number
   description = "Health check interval configuration for ECS task definitions."
@@ -141,7 +138,6 @@ variable "task_healthcheck_retries" {
   description = "Health check retries configuration for ECS task definitions."
   default     = 3
 }
-
 variable "task_healthcheck_start_period" {
   type        = number
   description = "Health check start period configuration for ECS task definitions."
