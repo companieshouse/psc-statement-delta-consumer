@@ -44,6 +44,7 @@
         <!--sonar configuration-->
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
         <sonar.projectKey>uk.gov.companieshouse:psc-statement-delta-consumer</sonar.projectKey>
+        <sonar.projectName>psc-statement-delta-consumer</sonar.projectName>
         <sonar.exclusions>**/delta/PscStatementDeltaConsumerApplication.java</sonar.exclusions>
         <sonar.sources>src/main</sonar.sources>
         <sonar.tests>src/test</sonar.tests>
@@ -54,6 +55,9 @@
         </sonar.coverage.jacoco.xmlReportPaths>
         <sonar.jacoco.reports>${project.basedir}/target/site</sonar.jacoco.reports>
         <sonar.java.binaries>${project.basedir}/target,${project.basedir}/target/*</sonar.java.binaries>
+        <sonar.token>${CODE_ANALYSIS_TOKEN}</sonar.token>
+        <sonar.login/>
+        <sonar.password/>
 
         <!--Plugin Configuration-->
         <maven.compiler.source>${java.version}</maven.compiler.source>
