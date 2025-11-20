@@ -4,6 +4,7 @@ import static org.springframework.kafka.support.KafkaHeaders.EXCEPTION_CAUSE_FQC
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Objects;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.internals.RecordHeader;
 import org.apache.kafka.common.header.internals.RecordHeaders;
@@ -23,7 +24,8 @@ public class TestHelper {
             resource = "psc-statement-delta-example.json";
         }
         InputStreamReader exampleJsonPayload = new InputStreamReader(
-                ClassLoader.getSystemClassLoader().getResourceAsStream(resource));
+                Objects.requireNonNull(
+                        ClassLoader.getSystemClassLoader().getResourceAsStream(resource)));
         String data = FileCopyUtils.copyToString(exampleJsonPayload);
 
         return buildDelta(data, isDelete);
@@ -37,7 +39,8 @@ public class TestHelper {
             resource = "psc-statement-delta-example.json";
         }
         InputStreamReader exampleJsonPayload = new InputStreamReader(
-                ClassLoader.getSystemClassLoader().getResourceAsStream(resource));
+                Objects.requireNonNull(
+                        ClassLoader.getSystemClassLoader().getResourceAsStream(resource)));
         String data = FileCopyUtils.copyToString(exampleJsonPayload);
 
         return buildMessage(data, isDelete);
@@ -68,8 +71,6 @@ public class TestHelper {
         Object obj = new Object();
         RecordHeaders headers = new RecordHeaders();
         headers.add(new RecordHeader(EXCEPTION_CAUSE_FQCN, header.getBytes()));
-        ProducerRecord<String, Object> record = new ProducerRecord<>(topic, 1, 1L, null, obj,
-                headers);
-        return record;
+        return new ProducerRecord<>(topic, 1, 1L, null, obj, headers);
     }
 }

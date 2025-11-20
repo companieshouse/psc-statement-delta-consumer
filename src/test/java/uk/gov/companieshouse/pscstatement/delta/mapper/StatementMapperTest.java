@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
+import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +25,7 @@ import uk.gov.companieshouse.api.psc.StatementLinksType;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 @ContextConfiguration(classes = {StatementMapperImpl.class})
-public class StatementMapperTest {
+class StatementMapperTest {
 
     @Autowired
     StatementMapper statementMapper;
@@ -41,7 +42,8 @@ public class StatementMapperTest {
         String path = "psc-statement-delta-example.json";
         String input = FileCopyUtils.copyToString(
                 new InputStreamReader(
-                        ClassLoader.getSystemClassLoader().getResourceAsStream(path)));
+                        Objects.requireNonNull(
+                                ClassLoader.getSystemClassLoader().getResourceAsStream(path))));
 
         deltaObject = mapper.readValue(input, PscStatementDelta.class);
         pscStatement = deltaObject.getPscStatements().get(0);
@@ -49,7 +51,7 @@ public class StatementMapperTest {
     }
 
     @Test
-    public void shouldMapPscStatementToStatement() {
+    void shouldMapPscStatementToStatement() {
         when(mapperUtils.encode("3000000002")).thenReturn("I5tVa-U7URp5pDuXSyEQ8NILVWU");
         when(mapperUtils.encode("3005011944")).thenReturn("Uuiit_lN49JBa-Jp3bqNLsa3UG8");
         Statement statement = statementMapper.pscStatementToStatement(pscStatement);
