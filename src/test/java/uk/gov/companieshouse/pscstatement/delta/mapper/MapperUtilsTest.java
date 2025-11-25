@@ -21,6 +21,6 @@ class MapperUtilsTest {
     @Test
     void encode_correctly_when_valid_salt_passed() {
         String actualValue = mapperUtils.encode(DECODED);
-        assertEquals(actualValue, ENCODED);
+        assertEquals(ENCODED, actualValue);
     }
 }

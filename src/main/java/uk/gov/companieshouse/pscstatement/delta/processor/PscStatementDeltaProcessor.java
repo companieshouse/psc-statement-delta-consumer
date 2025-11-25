@@ -1,7 +1,5 @@
 package uk.gov.companieshouse.pscstatement.delta.processor;
 
-import static uk.gov.companieshouse.pscstatement.delta.PscStatementDeltaConsumerApplication.APPLICATION_NAME_SPACE;
-
 import consumer.exception.RetryableErrorException;
 import java.util.List;
 import org.springframework.messaging.Message;
@@ -11,8 +9,6 @@ import uk.gov.companieshouse.api.delta.PscStatementDeleteDelta;
 import uk.gov.companieshouse.api.delta.PscStatementDelta;
 import uk.gov.companieshouse.api.psc.CompanyPscStatement;
 import uk.gov.companieshouse.delta.ChsDelta;
-import uk.gov.companieshouse.logging.Logger;
-import uk.gov.companieshouse.logging.LoggerFactory;
 import uk.gov.companieshouse.pscstatement.delta.logging.DataMapHolder;
 import uk.gov.companieshouse.pscstatement.delta.mapper.MapperUtils;
 import uk.gov.companieshouse.pscstatement.delta.service.ApiClientService;
