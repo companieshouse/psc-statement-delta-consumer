@@ -16,7 +16,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>
         <spring.boot.version>3.5.10</spring.boot.version>
-        <spring-webmvc.version>6.2.9</spring-webmvc.version>
+        <spring-webmvc.version>6.2.10</spring-webmvc.version>
         <main.class>uk.gov.companieshouse.pscstatement.delta.PscStatementDeltaConsumerApplication</main.class>
         <map-struct.version>1.6.3</map-struct.version>
         <aspectjweaver.version>1.9.24</aspectjweaver.version>
