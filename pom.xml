@@ -25,6 +25,7 @@
         <opentelemetry-instrumentation-bom.version>2.14.0</opentelemetry-instrumentation-bom.version>
         <apache-commons-lang3.version>3.18.0</apache-commons-lang3.version>
         <io-grpc-context.version>1.74.0</io-grpc-context.version>
+        <log4j-api.version>2.25.3</log4j-api.version>
 
         <!--CH Dependencies-->
         <ch-kafka.version>3.0.6</ch-kafka.version>
@@ -99,6 +100,12 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
             <version>${spring-webmvc.version}</version>
+        </dependency>
+        <!-- override log4j 2.24.3 brought in by spring-boot 3.5.9 - CVE-2025-68161(6.3)-->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j-api.version}</version>
         </dependency>
         <!--		Transitive deps end here-->
         <dependency>
