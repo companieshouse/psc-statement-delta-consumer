@@ -12,7 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
 
@@ -79,7 +79,7 @@ public class CustomRequestMatcher extends RequestMatcherExtension {
                     throw new RuntimeException(e);
                 }
             });
-            ObjectMapper mapper = new ObjectMapper();
+            JsonMapper mapper = JsonMapper.builder().build();
             JsonNode expectedNode = mapper.readTree(expectedBody.toString());
             JsonNode actualNode = mapper.readTree(actual.toString());
             boolean bodyResult = expectedNode.equals(actualNode);

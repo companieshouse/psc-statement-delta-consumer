@@ -12,7 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.Message;
-import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import uk.gov.companieshouse.api.delta.PscStatement;
 import uk.gov.companieshouse.api.psc.CompanyPscStatement;
 import uk.gov.companieshouse.delta.ChsDelta;
@@ -42,7 +42,7 @@ class PscStatementDeltaProcessorTest {
 
     @BeforeEach
     void setup() {
-        ObjectMapper mapper = new ObjectMapper();
+        JsonMapper mapper = JsonMapper.builder().build();
         deltaDeserialiser = new PscStatementDeltaDeserialiser(mapper);
         deltaProcessor = new PscStatementDeltaProcessor(transformer, deltaDeserialiser, apiClientService, mapperUtils);
     }

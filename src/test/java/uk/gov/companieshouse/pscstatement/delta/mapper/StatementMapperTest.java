@@ -15,7 +15,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.FileCopyUtils;
-import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import uk.gov.companieshouse.api.delta.PscStatement;
 import uk.gov.companieshouse.api.delta.PscStatementDelta;
 import uk.gov.companieshouse.api.psc.Statement;
@@ -29,7 +29,7 @@ class StatementMapperTest {
 
     @Autowired
     StatementMapper statementMapper;
-    private ObjectMapper mapper;
+    private JsonMapper mapper;
     private PscStatementDelta deltaObject;
     private PscStatement pscStatement;
     @MockitoBean
@@ -37,7 +37,7 @@ class StatementMapperTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        mapper = new ObjectMapper();
+        mapper = JsonMapper.builder().build();
 
         String path = "psc-statement-delta-example.json";
         String input = FileCopyUtils.copyToString(
