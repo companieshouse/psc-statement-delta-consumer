@@ -7,8 +7,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import consumer.exception.NonRetryableErrorException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +14,8 @@ import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import uk.gov.companieshouse.api.delta.PscStatementDeleteDelta;
 import uk.gov.companieshouse.api.delta.PscStatementDelta;
 
@@ -33,7 +33,7 @@ class PscStatementDeltaDeserialiserTest {
     private PscStatementDeleteDelta expectedDeleteDelta;
 
     @Test
-    void shouldDeserialiseToPscStatementDelta() throws JsonProcessingException {
+    void shouldDeserialiseToPscStatementDelta() {
         // given
         when(objectMapper.readValue(anyString(), eq(PscStatementDelta.class))).thenReturn(expectedDelta);
 
@@ -46,10 +46,10 @@ class PscStatementDeltaDeserialiserTest {
     }
 
     @Test
-    void shouldThrowNonRetryableExceptionWhenJsonProcessingExceptionThrown() throws JsonProcessingException {
+    void shouldThrowNonRetryableExceptionWhenJsonProcessingExceptionThrown() {
         // given
         when(objectMapper.readValue(anyString(), eq(PscStatementDelta.class))).thenThrow(
-                JsonProcessingException.class);
+                JacksonException.class);
 
         // when
         Executable executable = () -> deserialiser.deserialisePscStatementDelta(PSC_STATEMENT_DELTA);
@@ -62,7 +62,7 @@ class PscStatementDeltaDeserialiserTest {
     }
 
     @Test
-    void shouldDeserialiseToPscStatementDeleteDelta() throws JsonProcessingException {
+    void shouldDeserialiseToPscStatementDeleteDelta() {
         // given
         when(objectMapper.readValue(anyString(), eq(PscStatementDeleteDelta.class))).thenReturn(expectedDeleteDelta);
 
@@ -76,10 +76,10 @@ class PscStatementDeltaDeserialiserTest {
 
     @Test
     void shouldThrowNonRetryableExceptionWhenJsonProcessingExceptionThrownFromDeleteDelta()
-            throws JsonProcessingException {
+            throws JacksonException {
         // given
         when(objectMapper.readValue(anyString(), eq(PscStatementDeleteDelta.class))).thenThrow(
-                JsonProcessingException.class);
+                JacksonException.class);
 
         // when
         Executable executable = () -> deserialiser.deserialisePscStatementDeleteDelta(PSC_STATEMENT_DELETE_DELTA);

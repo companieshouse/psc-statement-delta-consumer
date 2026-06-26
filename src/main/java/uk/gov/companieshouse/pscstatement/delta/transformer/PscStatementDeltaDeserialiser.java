@@ -2,10 +2,10 @@ package uk.gov.companieshouse.pscstatement.delta.transformer;
 
 import static uk.gov.companieshouse.pscstatement.delta.PscStatementDeltaConsumerApplication.APPLICATION_NAME_SPACE;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import consumer.exception.NonRetryableErrorException;
 import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import uk.gov.companieshouse.api.delta.PscStatementDeleteDelta;
 import uk.gov.companieshouse.api.delta.PscStatementDelta;
 import uk.gov.companieshouse.logging.Logger;
@@ -27,7 +27,7 @@ public class PscStatementDeltaDeserialiser {
     public PscStatementDelta deserialisePscStatementDelta(String data) {
         try {
             return objectMapper.readValue(data, PscStatementDelta.class);
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             LOGGER.error(UPSERT_ERROR_MESSAGE.formatted(data), ex, DataMapHolder.getLogMap());
             throw new NonRetryableErrorException(UPSERT_ERROR_MESSAGE.formatted(data), ex);
         }
@@ -36,7 +36,7 @@ public class PscStatementDeltaDeserialiser {
     public PscStatementDeleteDelta deserialisePscStatementDeleteDelta(String data) {
         try {
             return objectMapper.readValue(data, PscStatementDeleteDelta.class);
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             LOGGER.error(DELETE_ERROR_MESSAGE.formatted(data), ex, DataMapHolder.getLogMap());
             throw new NonRetryableErrorException(DELETE_ERROR_MESSAGE.formatted(data), ex);
         }

@@ -3,7 +3,6 @@ package uk.gov.companieshouse.pscstatement.delta.mapper;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -16,6 +15,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.FileCopyUtils;
+import tools.jackson.databind.ObjectMapper;
 import uk.gov.companieshouse.api.delta.PscStatement;
 import uk.gov.companieshouse.api.delta.PscStatementDelta;
 import uk.gov.companieshouse.api.psc.Statement;

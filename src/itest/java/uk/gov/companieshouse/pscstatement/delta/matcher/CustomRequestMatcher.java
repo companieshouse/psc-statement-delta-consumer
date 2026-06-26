@@ -2,9 +2,6 @@ package uk.gov.companieshouse.pscstatement.delta.matcher;
 
 import static uk.gov.companieshouse.pscstatement.delta.PscStatementDeltaConsumerApplication.APPLICATION_NAME_SPACE;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.matching.MatchResult;
@@ -13,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
 
@@ -88,7 +88,7 @@ public class CustomRequestMatcher extends RequestMatcherExtension {
                 LOGGER.error("Body does not match expected: <" + var10001 + "> actual: <" + actualBody + ">");
             }
             return bodyResult;
-        } catch (JsonProcessingException | JSONException var8) {
+        } catch (JacksonException | JSONException var8) {
             Exception ex = var8;
             LOGGER.error("Error processing JSON: " + ex);
             return false;
