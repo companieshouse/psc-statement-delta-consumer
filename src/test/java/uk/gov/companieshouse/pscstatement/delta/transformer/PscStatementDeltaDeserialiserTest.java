@@ -75,8 +75,7 @@ class PscStatementDeltaDeserialiserTest {
     }
 
     @Test
-    void shouldThrowNonRetryableExceptionWhenJsonProcessingExceptionThrownFromDeleteDelta()
-            throws JacksonException {
+    void shouldThrowNonRetryableExceptionWhenJsonProcessingExceptionThrownFromDeleteDelta() {
         // given
         when(jsonMapper.readValue(anyString(), eq(PscStatementDeleteDelta.class))).thenThrow(
                 JacksonException.class);
