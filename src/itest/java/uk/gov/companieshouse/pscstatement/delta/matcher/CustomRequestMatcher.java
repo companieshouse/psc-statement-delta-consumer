@@ -6,7 +6,7 @@ import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.matching.MatchResult;
 import com.github.tomakehurst.wiremock.matching.RequestMatcherExtension;
-import java.util.ArrayList;
+
 import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,12 +22,6 @@ public class CustomRequestMatcher extends RequestMatcherExtension {
     private final String expectedOutput;
     private final String expectedUrl;
     private final List<String> fieldsToIgnore;
-
-    public CustomRequestMatcher(String output, String expectedUrl) {
-        this.expectedOutput = output;
-        this.expectedUrl = expectedUrl;
-        this.fieldsToIgnore = new ArrayList<>();
-    }
 
     public CustomRequestMatcher(String output, String expectedUrl,
             List<String> fieldsToIgnore) {
@@ -74,9 +68,8 @@ public class CustomRequestMatcher extends RequestMatcherExtension {
             this.fieldsToIgnore.forEach((fieldName) -> {
                 try {
                     this.removeField(actual, fieldName);
-                } catch (JSONException var4) {
-                    JSONException e = var4;
-                    throw new RuntimeException(e);
+                } catch (JSONException exception) {
+                    throw new RuntimeException(exception);
                 }
             });
             JsonMapper mapper = JsonMapper.builder().build();
@@ -88,9 +81,8 @@ public class CustomRequestMatcher extends RequestMatcherExtension {
                 LOGGER.error("Body does not match expected: <" + var10001 + "> actual: <" + actualBody + ">");
             }
             return bodyResult;
-        } catch (JacksonException | JSONException var8) {
-            Exception ex = var8;
-            LOGGER.error("Error processing JSON: " + ex);
+        } catch (JacksonException | JSONException exception) {
+            LOGGER.error("Error processing JSON: " + exception);
             return false;
         }
     }

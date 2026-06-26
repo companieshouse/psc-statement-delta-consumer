@@ -31,7 +31,6 @@ class PscStatementDeltaProcessorTest {
     private static final String ENCODED_ID = "encodedId";
     private final TestHelper testHelper = new TestHelper();
     private PscStatementDeltaProcessor deltaProcessor;
-    private PscStatementDeltaDeserialiser deltaDeserialiser;
 
     @Mock
     private ApiClientService apiClientService;
@@ -43,7 +42,7 @@ class PscStatementDeltaProcessorTest {
     @BeforeEach
     void setup() {
         JsonMapper mapper = JsonMapper.builder().build();
-        deltaDeserialiser = new PscStatementDeltaDeserialiser(mapper);
+        PscStatementDeltaDeserialiser deltaDeserialiser = new PscStatementDeltaDeserialiser(mapper);
         deltaProcessor = new PscStatementDeltaProcessor(transformer, deltaDeserialiser, apiClientService, mapperUtils);
     }
 

@@ -26,7 +26,6 @@ public class PscStatementDeltaConsumer {
     @RetryableTopic(attempts = "${psc-statement.delta.retry-attempts}",
             backOff = @BackOff(delayString = "${psc-statement.delta.backoff-delay}"),
             sameIntervalTopicReuseStrategy = SameIntervalTopicReuseStrategy.SINGLE_TOPIC,
-            retryTopicSuffix = "-retry",
             dltTopicSuffix = "-error",
             dltStrategy = DltStrategy.FAIL_ON_ERROR,
             autoCreateTopics = "false",

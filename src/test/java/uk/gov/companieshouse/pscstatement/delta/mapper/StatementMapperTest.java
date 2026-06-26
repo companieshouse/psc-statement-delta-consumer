@@ -29,15 +29,15 @@ class StatementMapperTest {
 
     @Autowired
     StatementMapper statementMapper;
-    private JsonMapper mapper;
-    private PscStatementDelta deltaObject;
+
     private PscStatement pscStatement;
+
     @MockitoBean
     private MapperUtils mapperUtils;
 
     @BeforeEach
     public void setUp() throws Exception {
-        mapper = JsonMapper.builder().build();
+        JsonMapper mapper = JsonMapper.builder().build();
 
         String path = "psc-statement-delta-example.json";
         String input = FileCopyUtils.copyToString(
@@ -45,8 +45,8 @@ class StatementMapperTest {
                         Objects.requireNonNull(
                                 ClassLoader.getSystemClassLoader().getResourceAsStream(path))));
 
-        deltaObject = mapper.readValue(input, PscStatementDelta.class);
-        pscStatement = deltaObject.getPscStatements().get(0);
+        PscStatementDelta deltaObject = mapper.readValue(input, PscStatementDelta.class);
+        pscStatement = deltaObject.getPscStatements().getFirst();
 
     }
 
