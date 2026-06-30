@@ -1,25 +1,23 @@
 package uk.gov.companieshouse.pscstatement.delta;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.resttestclient.TestRestTemplate;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-@AutoConfigureMockMvc
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestRestTemplate
 class PscStatementDeltaConsumerApplicationIT {
 
     @Autowired
-    private MockMvc mockMvc;
+    private TestRestTemplate testRestTemplate;
 
     @Test
     void shouldStartApplication() {
@@ -28,10 +26,10 @@ class PscStatementDeltaConsumerApplicationIT {
     }
 
     @Test
-    void shouldReturn200FromGetHealthEndpoint() throws Exception {
-        this.mockMvc.perform(get("/healthcheck"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().string("{\"status\":\"UP\"}"));
+    void healthEndpointShouldBeAvailableAndUp() {
+        ResponseEntity<String> response = testRestTemplate.getForEntity("/healthcheck", String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).contains("\"status\":\"UP\"");
     }
 }

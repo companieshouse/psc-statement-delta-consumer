@@ -3,7 +3,6 @@ package uk.gov.companieshouse.pscstatement.delta.mapper;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -16,6 +15,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.FileCopyUtils;
+import tools.jackson.databind.json.JsonMapper;
 import uk.gov.companieshouse.api.delta.PscStatement;
 import uk.gov.companieshouse.api.delta.PscStatementDelta;
 import uk.gov.companieshouse.api.psc.Statement;
@@ -29,15 +29,15 @@ class StatementMapperTest {
 
     @Autowired
     StatementMapper statementMapper;
-    private ObjectMapper mapper;
-    private PscStatementDelta deltaObject;
+
     private PscStatement pscStatement;
+
     @MockitoBean
     private MapperUtils mapperUtils;
 
     @BeforeEach
     public void setUp() throws Exception {
-        mapper = new ObjectMapper();
+        JsonMapper mapper = JsonMapper.builder().build();
 
         String path = "psc-statement-delta-example.json";
         String input = FileCopyUtils.copyToString(
@@ -45,8 +45,8 @@ class StatementMapperTest {
                         Objects.requireNonNull(
                                 ClassLoader.getSystemClassLoader().getResourceAsStream(path))));
 
-        deltaObject = mapper.readValue(input, PscStatementDelta.class);
-        pscStatement = deltaObject.getPscStatements().get(0);
+        PscStatementDelta deltaObject = mapper.readValue(input, PscStatementDelta.class);
+        pscStatement = deltaObject.getPscStatements().getFirst();
 
     }
 

@@ -5,40 +5,52 @@
     <parent>
         <groupId>uk.gov.companieshouse</groupId>
         <artifactId>companies-house-parent</artifactId>
-        <version>2.1.12</version>
+        <version>2.1.14</version>
     </parent>
+
     <artifactId>psc-statement-delta-consumer</artifactId>
     <version>unversioned</version>
     <name>psc-statement-delta-consumer</name>
     <description>PSC Statement Delta Consumer</description>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>
-        <spring.boot.version>3.5.11</spring.boot.version>
-        <spring-webmvc.version>6.2.16</spring-webmvc.version>
-        <main.class>uk.gov.companieshouse.pscstatement.delta.PscStatementDeltaConsumerApplication</main.class>
-        <map-struct.version>1.6.3</map-struct.version>
-        <aspectjweaver.version>1.9.24</aspectjweaver.version>
-        <avro.version>1.12.1</avro.version>
-        <xmlunit.version>2.10.3</xmlunit.version>
-        <opentelemetry-instrumentation-bom.version>2.14.0</opentelemetry-instrumentation-bom.version>
-        <apache-commons-lang3.version>3.18.0</apache-commons-lang3.version>
-        <io-grpc-context.version>1.74.0</io-grpc-context.version>
-        <log4j-api.version>2.25.3</log4j-api.version>
 
-        <!--CH Dependencies-->
-        <ch-kafka.version>3.0.7</ch-kafka.version>
-        <structured-logging.version>3.0.50</structured-logging.version>
-        <kafka-models.version>3.0.29</kafka-models.version>
-        <private-api-sdk-java.version>4.0.456</private-api-sdk-java.version>
-        <api-sdk-manager-java-library.version>3.0.15</api-sdk-manager-java-library.version>
-        <api-helper-java-library.version>3.0.3</api-helper-java-library.version>
+        <!-- Source: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot -->
+        <spring-boot.version>4.1.0</spring-boot.version>
+        <main.class>uk.gov.companieshouse.pscstatement.delta.PscStatementDeltaConsumerApplication</main.class>
+
+        <!-- Source: https://mvnrepository.com/artifact/org.mapstruct/mapstruct -->
+        <map-struct.version>1.6.3</map-struct.version>
+        <!-- Source: https://mvnrepository.com/artifact/org.apache.avro/avro -->
+        <apache-avro.version>1.12.1</apache-avro.version>
+        <!-- Source: https://mvnrepository.com/artifact/org.xmlunit/xmlunit-core -->
+        <xmlunit.version>2.12.0</xmlunit.version>
+        <!-- Source: https://mvnrepository.com/artifact/io.opentelemetry.instrumentation/opentelemetry-instrumentation-bom -->
+        <opentelemetry.version>2.29.0</opentelemetry.version>
+        <!-- Source: https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-bom -->
+        <kotlin.version>2.3.21</kotlin.version>
+        <!-- Source: https://mvnrepository.com/artifact/io.grpc/grpc-bom -->
+        <io-grpc.version>1.81.0</io-grpc.version>
+
+        <!-- CH Internal Dependencies       -->
+        <ch-kafka.version>3.0.15</ch-kafka.version>
+        <structured-logging.version>3.0.57</structured-logging.version>
+        <kafka-models.version>3.0.34</kafka-models.version>
+        <private-api-sdk-java.version>6.0.33</private-api-sdk-java.version>
+        <api-sdk-manager-java-library.version>3.0.23</api-sdk-manager-java-library.version>
+        <api-helper-java-library.version>3.0.4</api-helper-java-library.version>
 
         <!-- Tests -->
-        <io-cucumber.version>7.27.0</io-cucumber.version>
-        <assertj-core.version>3.27.7</assertj-core.version>
-        <wiremock.standalone.version>3.13.1</wiremock.standalone.version>
+        <!-- Source: https://mvnrepository.com/artifact/io.cucumber/cucumber-bom -->
+        <io-cucumber.version>7.34.3</io-cucumber.version>
+        <!-- Source: https://mvnrepository.com/artifact/org.wiremock/wiremock-standalone -->
+        <wiremock-standalone.version>3.13.2</wiremock-standalone.version>
+        <!-- Source: https://mvnrepository.com/artifact/org.testcontainers/testcontainers -->
+        <testcontainers.version>2.0.5</testcontainers.version>
+
         <skip.unit.tests>false</skip.unit.tests>
         <skip.integration.tests>false</skip.integration.tests>
 
@@ -56,35 +68,75 @@
         </sonar.coverage.jacoco.xmlReportPaths>
         <sonar.jacoco.reports>${project.basedir}/target/site</sonar.jacoco.reports>
         <sonar.java.binaries>${project.basedir}/target,${project.basedir}/target/*</sonar.java.binaries>
+        <!--suppress UnresolvedMavenProperty -->
         <sonar.token>${CODE_ANALYSIS_TOKEN}</sonar.token>
 
-        <!--Plugin Configuration-->
+
+        <!-- Plugin Configuration -->
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
-        <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+        <!-- Source: https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
+        <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
+        <!-- Source: https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
+        <maven-surefire-plugin.version>3.5.6</maven-surefire-plugin.version>
+        <!-- Source: https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-failsafe-plugin -->
+        <maven-failsafe-plugin.version>3.5.6</maven-failsafe-plugin.version>
+        <!-- Source: https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-resources-plugin -->
+        <maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
+        <!-- Source: https://mvnrepository.com/artifact/org.codehaus.mojo/build-helper-maven-plugin -->
         <maven-build-helper-plugin.version>3.6.1</maven-build-helper-plugin.version>
-        <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
-        <maven-failsafe-plugin.version>3.5.2</maven-failsafe-plugin.version>
-        <jib-maven-plugin.version>3.4.6</jib-maven-plugin.version>
+        <!-- Source: https://mvnrepository.com/artifact/com.google.cloud.tools/jib-maven-plugin -->
+        <jib-maven-plugin.version>3.5.1</jib-maven-plugin.version>
+
     </properties>
 
     <dependencyManagement>
         <dependencies>
+
             <dependency>
                 <groupId>io.opentelemetry.instrumentation</groupId>
                 <artifactId>opentelemetry-instrumentation-bom</artifactId>
-                <version>${opentelemetry-instrumentation-bom.version}</version>
+                <version>${opentelemetry.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-context</artifactId>
+                <version>${io-grpc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Source: https://mvnrepository.com/artifact/com.google.guava/guava -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>33.6.0-jre</version>
+            </dependency>
+
+            <!-- Source: https://mvnrepository.com/artifact/org.apache.zookeeper/zookeeper -->
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>3.8.6</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring.boot.version}</version>
+                <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -96,17 +148,7 @@
             <version>${xmlunit.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>${spring-webmvc.version}</version>
-        </dependency>
-        <!-- override log4j 2.24.3 brought in by spring-boot 3.5.9 - CVE-2025-68161(6.3)-->
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>${log4j-api.version}</version>
-        </dependency>
+
         <!-- Pinning version to address CVE-2024-29371 in 0.9.4 pulled transitively by spring-kafka-test:jar:3.3.13-->
         <dependency>
             <groupId>org.bitbucket.b_c</groupId>
@@ -114,36 +156,57 @@
             <version>0.9.6</version>
             <scope>compile</scope>
         </dependency>
+
         <!--		Transitive deps end here-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
+            <artifactId>spring-boot-starter-aspectj</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-logging</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-opentelemetry</artifactId>
+        </dependency>
+
+        <!-- Source: https://mvnrepository.com/artifact/io.opentelemetry.instrumentation/opentelemetry-logback-appender-1.0 -->
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-logback-appender-1.0</artifactId>
+            <version>${opentelemetry.version}-alpha</version>
+            <scope>compile</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${map-struct.version}</version>
         </dependency>
+
         <dependency>
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>kafka-models</artifactId>
@@ -152,7 +215,7 @@
                 <exclusion>
                     <groupId>org.apache.avro</groupId>
                     <artifactId>avro</artifactId>
-                 </exclusion>
+                </exclusion>
                 <exclusion>
                     <groupId>org.eclipse.jetty.http2</groupId>
                     <artifactId>http2-server</artifactId>
@@ -165,13 +228,15 @@
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>jetty-webapp</artifactId>
                 </exclusion>
-             </exclusions>
+            </exclusions>
         </dependency>
+
         <dependency>
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
-            <version>${avro.version}</version>
+            <version>${apache-avro.version}</version>
         </dependency>
+
         <dependency>
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>api-helper-java</artifactId>
@@ -183,35 +248,31 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>ch-kafka</artifactId>
             <version>${ch-kafka.version}</version>
         </dependency>
+
         <dependency>
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>structured-logging</artifactId>
             <version>${structured-logging.version}</version>
         </dependency>
+
         <dependency>
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>private-api-sdk-java</artifactId>
             <version>${private-api-sdk-java.version}</version>
         </dependency>
+
         <dependency>
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>api-sdk-manager-java-library</artifactId>
             <version>${api-sdk-manager-java-library.version}</version>
         </dependency>
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-context</artifactId>
-            <version>${io-grpc-context.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -223,6 +284,19 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-restclient</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka-test</artifactId>
@@ -234,75 +308,71 @@
             </exclusions>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>${assertj-core.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>kafka</artifactId>
+            <artifactId>testcontainers-kafka</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
+            <artifactId>testcontainers-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-core</artifactId>
             <version>${io-cucumber.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-java</artifactId>
             <version>${io-cucumber.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-junit</artifactId>
             <version>${io-cucumber.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-spring</artifactId>
             <version>${io-cucumber.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.wiremock</groupId>
             <artifactId>wiremock-standalone</artifactId>
-            <version>${wiremock.standalone.version}</version>
+            <version>${wiremock-standalone.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjweaver</artifactId>
-            <version>${aspectjweaver.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>${apache-commons-lang3.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.opentelemetry.instrumentation</groupId>
-            <artifactId>opentelemetry-spring-boot-starter</artifactId>
-        </dependency>
+
     </dependencies>
 
     <build>
@@ -310,7 +380,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring.boot.version}</version>
+                <version>${spring-boot.version}</version>
                 <configuration>
                     <mainClass>${main.class}</mainClass>
                 </configuration>

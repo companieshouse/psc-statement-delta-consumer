@@ -4,7 +4,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.Message;
+import tools.jackson.databind.json.JsonMapper;
 import uk.gov.companieshouse.api.delta.PscStatement;
 import uk.gov.companieshouse.api.psc.CompanyPscStatement;
 import uk.gov.companieshouse.delta.ChsDelta;
@@ -31,7 +31,6 @@ class PscStatementDeltaProcessorTest {
     private static final String ENCODED_ID = "encodedId";
     private final TestHelper testHelper = new TestHelper();
     private PscStatementDeltaProcessor deltaProcessor;
-    private PscStatementDeltaDeserialiser deltaDeserialiser;
 
     @Mock
     private ApiClientService apiClientService;
@@ -42,8 +41,8 @@ class PscStatementDeltaProcessorTest {
 
     @BeforeEach
     void setup() {
-        ObjectMapper mapper = new ObjectMapper();
-        deltaDeserialiser = new PscStatementDeltaDeserialiser(mapper);
+        JsonMapper mapper = JsonMapper.builder().build();
+        PscStatementDeltaDeserialiser deltaDeserialiser = new PscStatementDeltaDeserialiser(mapper);
         deltaProcessor = new PscStatementDeltaProcessor(transformer, deltaDeserialiser, apiClientService, mapperUtils);
     }
 

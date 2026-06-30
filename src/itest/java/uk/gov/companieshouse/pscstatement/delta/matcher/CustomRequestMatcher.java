@@ -2,17 +2,17 @@ package uk.gov.companieshouse.pscstatement.delta.matcher;
 
 import static uk.gov.companieshouse.pscstatement.delta.PscStatementDeltaConsumerApplication.APPLICATION_NAME_SPACE;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.matching.MatchResult;
 import com.github.tomakehurst.wiremock.matching.RequestMatcherExtension;
-import java.util.ArrayList;
+
 import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
 
@@ -22,12 +22,6 @@ public class CustomRequestMatcher extends RequestMatcherExtension {
     private final String expectedOutput;
     private final String expectedUrl;
     private final List<String> fieldsToIgnore;
-
-    public CustomRequestMatcher(String output, String expectedUrl) {
-        this.expectedOutput = output;
-        this.expectedUrl = expectedUrl;
-        this.fieldsToIgnore = new ArrayList<>();
-    }
 
     public CustomRequestMatcher(String output, String expectedUrl,
             List<String> fieldsToIgnore) {
@@ -74,12 +68,11 @@ public class CustomRequestMatcher extends RequestMatcherExtension {
             this.fieldsToIgnore.forEach((fieldName) -> {
                 try {
                     this.removeField(actual, fieldName);
-                } catch (JSONException var4) {
-                    JSONException e = var4;
-                    throw new RuntimeException(e);
+                } catch (JSONException exception) {
+                    throw new RuntimeException(exception);
                 }
             });
-            ObjectMapper mapper = new ObjectMapper();
+            JsonMapper mapper = JsonMapper.builder().build();
             JsonNode expectedNode = mapper.readTree(expectedBody.toString());
             JsonNode actualNode = mapper.readTree(actual.toString());
             boolean bodyResult = expectedNode.equals(actualNode);
@@ -88,9 +81,8 @@ public class CustomRequestMatcher extends RequestMatcherExtension {
                 LOGGER.error("Body does not match expected: <" + var10001 + "> actual: <" + actualBody + ">");
             }
             return bodyResult;
-        } catch (JsonProcessingException | JSONException var8) {
-            Exception ex = var8;
-            LOGGER.error("Error processing JSON: " + ex);
+        } catch (JacksonException | JSONException exception) {
+            LOGGER.error("Error processing JSON: " + exception);
             return false;
         }
     }
