@@ -37,7 +37,9 @@
 
         <!-- CH Internal Dependencies       -->
         <ch-bom.version>0.1.30</ch-bom.version>
+        <ch-kafka.version>3.0.15</ch-kafka.version>
         <private-api-sdk-java.version>6.0.33</private-api-sdk-java.version>
+        <api-sdk-manager-java-library.version>3.0.23</api-sdk-manager-java-library.version>
 
         <!-- Tests -->
         <!-- Source: https://mvnrepository.com/artifact/io.cucumber/cucumber-bom -->
@@ -262,6 +264,7 @@
         <dependency>
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>ch-kafka</artifactId>
+            <version>${ch-kafka.version}</version>
         </dependency>
 
         <dependency>
@@ -278,6 +281,7 @@
         <dependency>
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>api-sdk-manager-java-library</artifactId>
+            <version>${api-sdk-manager-java-library.version}</version>
         </dependency>
 
         <dependency>
