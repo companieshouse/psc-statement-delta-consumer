@@ -68,18 +68,18 @@ public abstract class StatementMapper {
     public void mapLinks(@MappingTarget Statement target, PscStatement source) {
         String encodedId = mapperUtils.encode(source.getPscStatementId());
         StatementLinksType links = new StatementLinksType();
+        LinkedPsc linkedPsc = source.getLinkedPsc();
         links.setSelf(String
                 .format("/company/%s/persons-with-significant-control-statements/%s",
                         source.getCompanyNumber(),
                         encodedId));
 
-        if (source.getLinkedPsc() != null) {
-            String encodedNotificationId = mapperUtils
-                    .encode(source.getLinkedPsc().getNotificationId());
+        if (linkedPsc != null) {
+            String encodedNotificationId = mapperUtils.encode(linkedPsc.getNotificationId());
             links.setPersonWithSignificantControl(String
                     .format("/company/%s/persons-with-significant-control/%s/%s",
                             source.getCompanyNumber(),
-                            source.getLinkedPsc().getPscKind(),
+                            linkedPsc.getPscKind(),
                             encodedNotificationId));
         }
         target.setLinks(links);

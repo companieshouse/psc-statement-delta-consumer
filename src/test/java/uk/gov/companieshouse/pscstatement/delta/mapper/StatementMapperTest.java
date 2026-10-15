@@ -1,6 +1,7 @@
 package uk.gov.companieshouse.pscstatement.delta.mapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 import java.io.InputStreamReader;
@@ -76,5 +77,19 @@ class StatementMapperTest {
         assertEquals(statement.getCeasedOn(), LocalDate.of(2023, 1, 27));
         assertEquals(expectedResult, statement);
 
+    }
+
+    @Test
+    void shouldMapPscStatementWithoutLinkedPsc() {
+        when(mapperUtils.encode("3000000002")).thenReturn("I5tVa-U7URp5pDuXSyEQ8NILVWU");
+        pscStatement.setLinkedPsc(null);
+
+        Statement statement = statementMapper.pscStatementToStatement(pscStatement);
+
+        assertNull(statement.getLinkedPscName());
+        assertNull(statement.getLinks().getPersonWithSignificantControl());
+        assertEquals(
+                "/company/08694860/persons-with-significant-control-statements/I5tVa-U7URp5pDuXSyEQ8NILVWU",
+                statement.getLinks().getSelf());
     }
 }

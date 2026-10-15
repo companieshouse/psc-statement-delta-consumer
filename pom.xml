@@ -19,7 +19,7 @@
         <java.version>21</java.version>
 
         <!-- Source: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot -->
-        <spring-boot.version>4.1.0</spring-boot.version>
+        <spring-boot-dependencies.version>4.1.1</spring-boot-dependencies.version>
         <main.class>uk.gov.companieshouse.pscstatement.delta.PscStatementDeltaConsumerApplication</main.class>
 
         <!-- Source: https://mvnrepository.com/artifact/org.mapstruct/mapstruct -->
@@ -36,12 +36,10 @@
         <io-grpc.version>1.81.0</io-grpc.version>
 
         <!-- CH Internal Dependencies       -->
+        <ch-bom.version>0.1.30</ch-bom.version>
         <ch-kafka.version>3.0.15</ch-kafka.version>
-        <structured-logging.version>4.0.4</structured-logging.version>
-        <kafka-models.version>3.0.34</kafka-models.version>
         <private-api-sdk-java.version>6.0.33</private-api-sdk-java.version>
         <api-sdk-manager-java-library.version>3.0.23</api-sdk-manager-java-library.version>
-        <api-helper-java-library.version>3.0.4</api-helper-java-library.version>
 
         <!-- Tests -->
         <!-- Source: https://mvnrepository.com/artifact/io.cucumber/cucumber-bom -->
@@ -93,6 +91,30 @@
     <dependencyManagement>
         <dependencies>
 
+            <!-- ch-boms -->
+            <dependency>
+                <groupId>uk.gov.companieshouse</groupId>
+                <artifactId>ch-dependency-bom</artifactId>
+                <version>${ch-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>uk.gov.companieshouse</groupId>
+                <artifactId>ch-test-bom</artifactId>
+                <version>${ch-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot-dependencies.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <dependency>
                 <groupId>io.opentelemetry.instrumentation</groupId>
                 <artifactId>opentelemetry-instrumentation-bom</artifactId>
@@ -127,14 +149,6 @@
                 <groupId>org.apache.zookeeper</groupId>
                 <artifactId>zookeeper</artifactId>
                 <version>3.8.6</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
             </dependency>
 
         </dependencies>
@@ -210,7 +224,6 @@
         <dependency>
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>kafka-models</artifactId>
-            <version>${kafka-models.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.avro</groupId>
@@ -240,7 +253,6 @@
         <dependency>
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>api-helper-java</artifactId>
-            <version>${api-helper-java-library.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-lang</groupId>
@@ -258,7 +270,6 @@
         <dependency>
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>structured-logging</artifactId>
-            <version>${structured-logging.version}</version>
         </dependency>
 
         <dependency>
@@ -380,7 +391,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot.version}</version>
+                <version>${spring-boot-dependencies.version}</version>
                 <configuration>
                     <mainClass>${main.class}</mainClass>
                 </configuration>
