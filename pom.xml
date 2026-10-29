@@ -28,18 +28,14 @@
         <apache-avro.version>1.12.1</apache-avro.version>
         <!-- Source: https://mvnrepository.com/artifact/org.xmlunit/xmlunit-core -->
         <xmlunit.version>2.12.0</xmlunit.version>
-        <!-- Source: https://mvnrepository.com/artifact/io.opentelemetry.instrumentation/opentelemetry-instrumentation-bom -->
-        <opentelemetry.version>2.29.0</opentelemetry.version>
         <!-- Source: https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-bom -->
         <kotlin.version>2.3.21</kotlin.version>
         <!-- Source: https://mvnrepository.com/artifact/io.grpc/grpc-bom -->
         <io-grpc.version>1.81.0</io-grpc.version>
 
         <!-- CH Internal Dependencies       -->
-        <ch-bom.version>0.1.30</ch-bom.version>
-        <ch-kafka.version>3.0.15</ch-kafka.version>
+        <ch-bom.version>0.1.35</ch-bom.version>
         <private-api-sdk-java.version>6.0.33</private-api-sdk-java.version>
-        <api-sdk-manager-java-library.version>3.0.23</api-sdk-manager-java-library.version>
 
         <!-- Tests -->
         <!-- Source: https://mvnrepository.com/artifact/io.cucumber/cucumber-bom -->
@@ -116,14 +112,6 @@
             </dependency>
 
             <dependency>
-                <groupId>io.opentelemetry.instrumentation</groupId>
-                <artifactId>opentelemetry-instrumentation-bom</artifactId>
-                <version>${opentelemetry.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
                 <groupId>io.grpc</groupId>
                 <artifactId>grpc-context</artifactId>
                 <version>${io-grpc.version}</version>
@@ -135,13 +123,6 @@
                 <version>${testcontainers.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-
-            <!-- Source: https://mvnrepository.com/artifact/com.google.guava/guava -->
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>33.6.0-jre</version>
             </dependency>
 
             <!-- Source: https://mvnrepository.com/artifact/org.apache.zookeeper/zookeeper -->
@@ -211,14 +192,12 @@
         <dependency>
             <groupId>io.opentelemetry.instrumentation</groupId>
             <artifactId>opentelemetry-logback-appender-1.0</artifactId>
-            <version>${opentelemetry.version}-alpha</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
-            <version>${map-struct.version}</version>
         </dependency>
 
         <dependency>
@@ -264,7 +243,6 @@
         <dependency>
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>ch-kafka</artifactId>
-            <version>${ch-kafka.version}</version>
         </dependency>
 
         <dependency>
@@ -281,7 +259,6 @@
         <dependency>
             <groupId>uk.gov.companieshouse</groupId>
             <artifactId>api-sdk-manager-java-library</artifactId>
-            <version>${api-sdk-manager-java-library.version}</version>
         </dependency>
 
         <dependency>
