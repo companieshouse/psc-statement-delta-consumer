@@ -84,6 +84,7 @@ public class KafkaConfig {
         factory.setConsumerFactory(kafkaConsumerFactory());
         factory.setConcurrency(listenerConcurrency);
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
+        factory.getContainerProperties().setObservationEnabled(true);
 
         return factory;
     }
@@ -93,7 +94,9 @@ public class KafkaConfig {
      */
     @Bean
     public KafkaTemplate<String, Object> kafkaTemplate() {
-        return new KafkaTemplate<>(kafkaProducerFactory());
+        KafkaTemplate<String, Object> template = new KafkaTemplate<>(kafkaProducerFactory());
+        template.setObservationEnabled(true);
+        return template;
     }
 
     private Map<String, Object> consumerConfigs() {
