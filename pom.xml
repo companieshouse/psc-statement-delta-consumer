@@ -34,7 +34,7 @@
         <io-grpc.version>1.81.0</io-grpc.version>
 
         <!-- CH Internal Dependencies       -->
-        <ch-bom.version>0.1.35</ch-bom.version>
+        <ch-bom.version>0.1.42</ch-bom.version>
         <private-api-sdk-java.version>7.2.20</private-api-sdk-java.version>
 
         <!-- Tests -->
